@@ -38,10 +38,12 @@ class handler(BaseHTTPRequestHandler):
         if not sender_email or not sender_password:
             self.send_response(500)
             self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
+            debug_info = f"SMTP_EMAIL is '{sender_email}'. SMTP_PASSWORD is {'SET' if sender_password else 'MISSING'}."
             self.wfile.write(json.dumps({
                 "success": False, 
-                "error": "Server SMTP environment variables (SMTP_EMAIL, SMTP_PASSWORD) are not configured."
+                "error": f"Server SMTP variables missing. {debug_info} Please check Vercel Environment Variables exactly."
             }).encode('utf-8'))
             return
 
