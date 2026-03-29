@@ -62,15 +62,18 @@ document.addEventListener('DOMContentLoaded', () => {
             button.innerHTML = 'TRANSMITTING...';
             button.disabled = true;
 
-            fetch(form.action, {
-                method: form.method,
-                body: data,
+            const payload = Object.fromEntries(data.entries());
+
+            fetch('/api/contact', {
+                method: 'POST',
+                body: JSON.stringify(payload),
                 headers: {
+                    'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 }
-            }).then(response => {
-                if (response.ok) {
-                    alert("[SYSTEM] Transmission successful.");
+            }).then(response => response.json()).then(data => {
+                if (data.success) {
+                    alert("[SYSTEM] Transmission successful via Python SMTP.");
                     form.reset();
                     
                     // Record this successful submission timestamp
@@ -81,12 +84,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     button.innerHTML = 'EXECUTE_TRANSMISSION <span class="material-symbols-outlined text-xl">send</span>';
 
                 } else {
-                    alert("[ERROR] Transmission rejected by server network. Verify endpoint.");
+                    alert("[ERROR] Server SMTP Rejection: " + (data.error || "Unknown Error"));
                     button.disabled = false;
                     button.innerHTML = 'EXECUTE_TRANSMISSION <span class="material-symbols-outlined text-xl">send</span>';
                 }
             }).catch(error => {
-                alert("[ERROR] Transmission failed - Check network connection.");
+                alert("[ERROR] Transmission failed - Check network connection or server logs.");
                 button.disabled = false;
                 button.innerHTML = 'EXECUTE_TRANSMISSION <span class="material-symbols-outlined text-xl">send</span>';
             });
