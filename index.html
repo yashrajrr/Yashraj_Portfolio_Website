@@ -15,91 +15,10 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
 
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "on-surface-variant": "#c7c4d7",
-                        "on-secondary-container": "#bab8b7",
-                        "on-background": "#e5e2e1",
-                        "inverse-surface": "#e5e2e1",
-                        "primary-fixed-dim": "#c0c1ff",
-                        "outline-variant": "#464554",
-                        "secondary-fixed": "#e5e2e1",
-                        "on-primary-fixed": "#07006c",
-                        "primary-container": "#8083ff",
-                        "inverse-on-surface": "#313030",
-                        "secondary-container": "#4a4949",
-                        "surface-variant": "#353534",
-                        "on-tertiary-fixed-variant": "#93000b",
-                        "on-secondary-fixed-variant": "#474646",
-                        "tertiary-fixed-dim": "#ffb4ab",
-                        "on-tertiary-container": "#5c0004",
-                        "on-surface": "#e5e2e1",
-                        "on-secondary": "#313030",
-                        "secondary-fixed-dim": "#c8c6c5",
-                        "primary-fixed": "#e1e0ff",
-                        "surface-dim": "#131313",
-                        "on-tertiary-fixed": "#410002",
-                        "outline": "#908fa0",
-                        "tertiary": "#ffb4ab",
-                        "surface-container-lowest": "#0e0e0e",
-                        "secondary": "#c8c6c5",
-                        "surface-container": "#201f1f",
-                        "surface-tint": "#c0c1ff",
-                        "surface": "#131313",
-                        "on-tertiary": "#690005",
-                        "on-error-container": "#ffdad6",
-                        "error-container": "#93000a",
-                        "inverse-primary": "#494bd6",
-                        "on-primary-container": "#0d0096",
-                        "surface-bright": "#393939",
-                        "on-primary": "#1000a9",
-                        "surface-container-high": "#2a2a2a",
-                        "primary": "#c0c1ff",
-                        "surface-container-highest": "#353534",
-                        "on-primary-fixed-variant": "#2f2ebe",
-                        "tertiary-fixed": "#ffdad6",
-                        "on-secondary-fixed": "#1c1b1b",
-                        "error": "#ffb4ab",
-                        "background": "#131313",
-                        "surface-container-low": "#1c1b1b",
-                        "on-error": "#690005",
-                        "tertiary-container": "#ff544a"
-                    },
-                    fontFamily: {
-                        "headline": ["Public Sans"],
-                        "body": ["Inter"],
-                        "label": ["Inter"]
-                    },
-                    borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "999px" },
-                },
-            },
-        }
-    </script>
-    <style>
-        html {
-            font-size: 80%;
-            /* Scales down all rem-based Tailwind sizes (padding, text, etc.) */
-        }
-
-        body {
-            background-color: #131313;
-            background-image: radial-gradient(rgba(192, 193, 255, 0.03) 1px, transparent 0);
-            background-size: 40px 40px;
-            scroll-behavior: smooth;
-        }
-
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-
-        .brutal-shadow {
-            box-shadow: 0 20px 40px rgba(13, 0, 150, 0.12);
-        }
-    </style>
+    <!-- Tailwind Configuration -->
+    <script src="tailwind.config.js"></script>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body class="font-body text-on-surface selection:bg-primary selection:text-on-primary">
@@ -197,7 +116,7 @@
                     class="bg-surface h-[400px] md:h-[500px] w-full flex items-center justify-center relative z-10 overflow-hidden border-r border-b border-white/10">
                     <!-- Using an abstract tech image to align with the Brutalist Aesthetic -->
                     <img class="w-full h-full object-cover grayscale opacity-90 group-hover:scale-105 transition-transform duration-700"
-                        alt="Tech infrastructure abstract" src="yashraj sketch.png" />
+                        alt="Tech infrastructure abstract" src="asset/yashraj sketch.png" />
                     <div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-45"></div>
                 </div>
             </div>
@@ -253,7 +172,7 @@
                     </div>
                     <img class="absolute inset-0 w-full h-full object-cover grayscale opacity-80 group-hover:scale-105 group-hover:opacity-50 transition-all duration-700"
                         alt="RAG AI System Visual"
-                        src="rag_ai.png" />
+                        src="asset/rag_ai.png" />
 
                     <div class="absolute bottom-0 left-0 p-8 md:p-12 w-full z-20">
                         <div class="flex gap-3 mb-4 flex-wrap">
@@ -656,13 +575,13 @@
                 </p>
 
                 <div class="space-y-6">
-                    <a href="mailto:yashrajrr4@gmail.com" class="flex items-center gap-6 group">
+                    <a href="mailto:yashrajrathor2005@gmail.com" class="flex items-center gap-6 group">
                         <div
                             class="w-14 h-14 bg-surface-container-highest flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors brutal-shadow">
                             <span class="material-symbols-outlined">mail</span>
                         </div>
                         <span
-                            class="text-lg md:text-xl font-bold font-headline uppercase break-all">yashrajrr4@gmail.com</span>
+                            class="text-lg md:text-xl font-bold font-headline uppercase break-all">yashrajrathor2005@gmail.com</span>
                     </a>
 
                     <a href="https://www.linkedin.com/in/yashrajrr" target="_blank"
@@ -680,7 +599,9 @@
                         class="flex items-center gap-6 group">
                         <div
                             class="w-14 h-14 bg-surface-container-highest flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors brutal-shadow">
-                            <span class="font-headline font-black text-2xl">gh</span>
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.30-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                            </svg>
                         </div>
                         <span
                             class="text-lg md:text-xl font-bold font-headline uppercase">github.com/yashrajrr</span>
@@ -704,8 +625,12 @@
                     class="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-outline-variant m-4 pointer-events-none">
                 </div>
 
-                <form class="space-y-8 relative z-10"
-                    onsubmit="event.preventDefault(); window.location.href='mailto:yashrajrr4@gmail.com';">
+                <!-- FormSubmit unique endpoint (conceals raw email) -->
+                <form class="space-y-8 relative z-10" id="contact-form" action="https://formsubmit.co/c58c2cab10f7bb0289ed80bcca9f0245" method="POST">
+                    <!-- Basic configurations for FormSubmit -->
+                    <input type="hidden" name="_captcha" value="false">
+                    <input type="hidden" name="_subject" value="New Submission from Portfolio!">
+
                     <div>
                         <label
                             class="block text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-on-surface-variant mb-2">Connection
@@ -715,7 +640,7 @@
                     <div>
                         <label
                             class="block text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-on-surface-variant mb-2">Identifier</label>
-                        <input
+                        <input name="name"
                             class="w-full bg-surface-container-highest border-0 focus:ring-0 focus:border-b-2 focus:border-primary text-white p-4 font-bold placeholder:text-outline-variant transition-colors"
                             placeholder="Full Name / Company" type="text" required />
                     </div>
@@ -723,7 +648,7 @@
                         <label
                             class="block text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-on-surface-variant mb-2">Payload
                             (Message)</label>
-                        <textarea
+                        <textarea name="message"
                             class="w-full bg-surface-container-highest border-0 focus:ring-0 focus:border-b-2 focus:border-primary text-white p-4 font-bold placeholder:text-outline-variant resize-none transition-colors"
                             placeholder="How can we collaborate?..." rows="4" required></textarea>
                     </div>
@@ -733,6 +658,35 @@
                         <span class="material-symbols-outlined text-xl">send</span>
                     </button>
                 </form>
+
+                <script>
+                    document.getElementById('contact-form').addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const form = e.target;
+                        const data = new FormData(form);
+                        const button = form.querySelector('button[type="submit"]');
+                        button.innerHTML = 'TRANSMITTING...';
+
+                        fetch(form.action, {
+                            method: form.method,
+                            body: data,
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        }).then(response => {
+                            if (response.ok) {
+                                alert("Message transmitted successfully!");
+                                form.reset();
+                            } else {
+                                alert("Important: Please check your yashrajrathor2005@gmail.com inbox to ACTIVATE FormSubmit for the new email address before messages can be received.");
+                            }
+                        }).catch(error => {
+                            alert("Transmission failed. Please try again.");
+                        }).finally(() => {
+                            button.innerHTML = 'EXECUTE_TRANSMISSION <span class="material-symbols-outlined text-xl">send</span>';
+                        });
+                    });
+                </script>
             </div>
         </div>
     </section>
@@ -751,7 +705,7 @@
             <a class="text-on-surface-variant hover:text-white transition-colors font-['Inter'] text-xs font-bold tracking-[0.2em] uppercase"
                 href="https://github.com/yashrajrr" target="_blank">GitHub</a>
             <a class="text-on-surface-variant hover:text-white transition-colors font-['Inter'] text-xs font-bold tracking-[0.2em] uppercase"
-                href="mailto:yashrajrr4@gmail.com">Email</a>
+                href="mailto:yashrajrathor2005@gmail.com">Email</a>
             <a class="text-on-surface-variant hover:text-white transition-colors font-['Inter'] text-xs font-bold tracking-[0.2em] uppercase"
                 href="#home">Back to Top</a>
         </div>
@@ -761,38 +715,8 @@
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const sections = document.querySelectorAll('section');
-            const navLinks = document.querySelectorAll('.nav-link');
-
-            // Set up scroll observer script 
-            window.addEventListener('scroll', () => {
-                let currentId = '';
-
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
-                    const sectionHeight = section.clientHeight;
-                    // Trigger active state when section enters top third of view
-                    if (scrollY >= (sectionTop - window.innerHeight / 3)) {
-                        currentId = section.getAttribute('id');
-                    }
-                });
-
-                navLinks.forEach(link => {
-                    // Reset styling to default
-                    link.classList.remove('text-[#C0C1FF]', 'border-[#C0C1FF]');
-                    link.classList.add('text-slate-400', 'border-transparent');
-                    
-                    // Apply primary styling for active section
-                    if (link.getAttribute('href') === `#${currentId}`) {
-                        link.classList.add('text-[#C0C1FF]', 'border-[#C0C1FF]');
-                        link.classList.remove('text-slate-400', 'border-transparent');
-                    }
-                });
-            });
-        });
-    </script>
+    <!-- Main Script -->
+    <script src="main.js"></script>
 </body>
 
 </html>

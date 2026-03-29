@@ -1,0 +1,18 @@
+html {
+    font-size: 80%;
+}
+
+body {
+    background-color: #131313;
+    background-image: radial-gradient(rgba(192, 193, 255, 0.03) 1px, transparent 0);
+    background-size: 40px 40px;
+    scroll-behavior: smooth;
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.brutal-shadow {
+    box-shadow: 0 20px 40px rgba(13, 0, 150, 0.12);
+}
