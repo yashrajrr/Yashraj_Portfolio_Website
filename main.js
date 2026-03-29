@@ -48,7 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const waitTimeMs = 600000 - (currentTime - oldest);
                 const waitMinutes = Math.ceil(waitTimeMs / 60000);
                 
-                alert(`[SYSTEM] Action Denied: Maximum 3 transmissions per 10 minutes reached. Please wait ${waitMinutes} minute(s) before sending another message.`);
+                button.innerHTML = `LOCKED (${waitMinutes}m) <span class="material-symbols-outlined text-xl">lock</span>`;
+                button.disabled = true;
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = 'EXECUTE_TRANSMISSION <span class="material-symbols-outlined text-xl">send</span>';
+                }, 3000);
                 return;
             }
 
@@ -73,25 +78,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }).then(response => response.json()).then(data => {
                 if (data.success) {
-                    alert("[SYSTEM] Transmission successful via Python SMTP.");
                     form.reset();
                     
                     // Record this successful submission timestamp
                     history.push(currentTime);
                     localStorage.setItem('submission_history', JSON.stringify(history));
                     
-                    button.disabled = false;
-                    button.innerHTML = 'EXECUTE_TRANSMISSION <span class="material-symbols-outlined text-xl">send</span>';
+                    button.innerHTML = 'DELIVERED <span class="material-symbols-outlined text-xl">check_circle</span>';
+                    setTimeout(() => {
+                        button.disabled = false;
+                        button.innerHTML = 'EXECUTE_TRANSMISSION <span class="material-symbols-outlined text-xl">send</span>';
+                    }, 4000);
 
                 } else {
-                    alert("[ERROR] Server SMTP Rejection: " + (data.error || "Unknown Error"));
-                    button.disabled = false;
-                    button.innerHTML = 'EXECUTE_TRANSMISSION <span class="material-symbols-outlined text-xl">send</span>';
+                    button.innerHTML = 'REJECTED <span class="material-symbols-outlined text-xl">error</span>';
+                    setTimeout(() => {
+                        button.disabled = false;
+                        button.innerHTML = 'EXECUTE_TRANSMISSION <span class="material-symbols-outlined text-xl">send</span>';
+                    }, 4000);
                 }
             }).catch(error => {
-                alert("[ERROR] Transmission failed - Check network connection or server logs.");
-                button.disabled = false;
-                button.innerHTML = 'EXECUTE_TRANSMISSION <span class="material-symbols-outlined text-xl">send</span>';
+                button.innerHTML = 'NETWORK ERROR <span class="material-symbols-outlined text-xl">wifi_off</span>';
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = 'EXECUTE_TRANSMISSION <span class="material-symbols-outlined text-xl">send</span>';
+                }, 4000);
             });
         });
     }

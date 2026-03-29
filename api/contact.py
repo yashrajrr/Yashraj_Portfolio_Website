@@ -27,7 +27,6 @@ class handler(BaseHTTPRequestHandler):
             return
             
         name = data.get('name', 'Unknown Identifier')
-        email = data.get('email', 'No Endpoint Provided')
         message = data.get('message', 'No Payload')
 
         # Environment variables securely configured on Vercel
@@ -56,20 +55,18 @@ class handler(BaseHTTPRequestHandler):
 =========================================
 
 From: {name}
-Email: {email}
 
 Message:
 -----------------------------------------
 {message}
 -----------------------------------------
 
-※ Reply directly to this email to respond to {name}.
+※ Generated securely via Python SMTP Backend.
 """
         msg.set_content(email_body)
         msg['Subject'] = f"Portfolio Inquiry from {name}"
         msg['From'] = sender_email
         msg['To'] = recipient_email
-        msg['Reply-To'] = email
 
         # Execution of SMTP transmission via standard library
         try:
