@@ -27,4 +27,69 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+    // Contact Form Anti-Spam & Fetch Logic
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = new FormData(form);
+            const button = document.getElementById('submit-btn');
+
+            // CLIENT-SIDE RATE LIMITING (3 Messages per 10 minutes)
+            const currentTime = new Date().getTime();
+            let history = JSON.parse(localStorage.getItem('submission_history') || '[]');
+            
+            // Keep only timestamps from the last 10 minutes (600,000 miliseconds)
+            history = history.filter(time => currentTime - time < 600000);
+            
+            if (history.length >= 3) {
+                const oldest = history[0];
+                const waitTimeMs = 600000 - (currentTime - oldest);
+                const waitMinutes = Math.ceil(waitTimeMs / 60000);
+                
+                alert(`[SYSTEM] Action Denied: Maximum 3 transmissions per 10 minutes reached. Please wait ${waitMinutes} minute(s) before sending another message.`);
+                return;
+            }
+
+            // CLIENT-SIDE SANITIZATION (Basic XSS Prevention)
+            for (let [key, value] of data.entries()) {
+                if (typeof value === 'string') {
+                    data.set(key, value.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+                }
+            }
+
+            button.innerHTML = 'TRANSMITTING...';
+            button.disabled = true;
+
+            fetch(form.action, {
+                method: form.method,
+                body: data,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    alert("[SYSTEM] Transmission successful.");
+                    form.reset();
+                    
+                    // Record this successful submission timestamp
+                    history.push(currentTime);
+                    localStorage.setItem('submission_history', JSON.stringify(history));
+                    
+                    button.disabled = false;
+                    button.innerHTML = 'EXECUTE_TRANSMISSION <span class="material-symbols-outlined text-xl">send</span>';
+
+                } else {
+                    alert("[ERROR] Transmission rejected by server network. Verify endpoint.");
+                    button.disabled = false;
+                    button.innerHTML = 'EXECUTE_TRANSMISSION <span class="material-symbols-outlined text-xl">send</span>';
+                }
+            }).catch(error => {
+                alert("[ERROR] Transmission failed - Check network connection.");
+                button.disabled = false;
+                button.innerHTML = 'EXECUTE_TRANSMISSION <span class="material-symbols-outlined text-xl">send</span>';
+            });
+        });
+    }
 });
