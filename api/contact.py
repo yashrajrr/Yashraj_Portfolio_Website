@@ -49,10 +49,27 @@ class handler(BaseHTTPRequestHandler):
 
         # Construction of the standard Email Message
         msg = EmailMessage()
-        msg.set_content(f"Portfolio Communication Received:\n\nSender: {name}\nReturn Endpoint: {email}\n\nPayload:\n{message}")
-        msg['Subject'] = f"PORTFOLIO CONTACT: Message from {name}"
+        
+        email_body = f"""
+=========================================
+      NEW PORTFOLIO INQUIRY
+=========================================
+
+From: {name}
+Email: {email}
+
+Message:
+-----------------------------------------
+{message}
+-----------------------------------------
+
+※ Reply directly to this email to respond to {name}.
+"""
+        msg.set_content(email_body)
+        msg['Subject'] = f"Portfolio Inquiry from {name}"
         msg['From'] = sender_email
         msg['To'] = recipient_email
+        msg['Reply-To'] = email
 
         # Execution of SMTP transmission via standard library
         try:
