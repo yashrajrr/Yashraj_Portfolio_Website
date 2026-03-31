@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const payload = Object.fromEntries(data.entries());
 
-            fetch('/api/contact', {
+            fetch(form.action, {
                 method: 'POST',
                 body: JSON.stringify(payload),
                 headers: {

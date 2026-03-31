@@ -618,14 +618,16 @@
                     class="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-outline-variant m-4 pointer-events-none">
                 </div>
 
-                <!-- FormSubmit unique endpoint (conceals raw email) -->
-                <form class="space-y-8 relative z-10" id="contact-form" action="https://formsubmit.co/c58c2cab10f7bb0289ed80bcca9f0245" method="POST">
+                <!-- Web3Forms API Endpoint -->
+                <form class="space-y-8 relative z-10" id="contact-form" action="https://api.web3forms.com/submit" method="POST">
                     
-                    <!-- Advanced Anti-Spam Configurations -->
-                    <!-- Honeypot Field: Bots will fill this out, real users won't see it. FormSubmit silently drops honeypot emails. -->
-                    <input type="text" name="_honey" style="display:none">
-                    <input type="hidden" name="_subject" value="New Submission from Portfolio!">
-                    <input type="hidden" name="_template" value="box">
+                    <!-- Web3Forms Authentication -->
+                    <input type="hidden" name="access_key" value="298d7e6b-6ac7-4abb-9d99-27d106eb061e">
+                    <input type="hidden" name="subject" value="New Submission from Portfolio!">
+                    <input type="hidden" name="from_name" value="Portfolio Notification">
+                    
+                    <!-- Web3Forms Honeypot Anti-Spam -->
+                    <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
 
                     <div>
                         <label
