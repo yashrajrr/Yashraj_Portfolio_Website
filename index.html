@@ -5,6 +5,8 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Yashraj Rathor | Data Engineer & ML Portfolio</title>
+    <!-- Content Security Policy to mitigate XSS and injection attacks -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; object-src 'none';">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <!-- Google Fonts -->
@@ -39,13 +41,15 @@
                 <a class="nav-link text-slate-400 border-b-4 border-transparent hover:text-white hover:border-white/50 pb-1 font-['Public_Sans'] font-black tracking-tighter uppercase text-sm transition-all duration-300"
                     href="#projects">Projects</a>
                 <a class="nav-link text-slate-400 border-b-4 border-transparent hover:text-white hover:border-white/50 pb-1 font-['Public_Sans'] font-black tracking-tighter uppercase text-sm transition-all duration-300"
-                    href="#tech-stack">Stack</a>
-                <a class="nav-link text-slate-400 border-b-4 border-transparent hover:text-white hover:border-white/50 pb-1 font-['Public_Sans'] font-black tracking-tighter uppercase text-sm transition-all duration-300"
                     href="#skills">Skills</a>
                 <a class="nav-link text-slate-400 border-b-4 border-transparent hover:text-white hover:border-white/50 pb-1 font-['Public_Sans'] font-black tracking-tighter uppercase text-sm transition-all duration-300"
                     href="#experience">Experience</a>
                 <a class="nav-link text-slate-400 border-b-4 border-transparent hover:text-white hover:border-white/50 pb-1 font-['Public_Sans'] font-black tracking-tighter uppercase text-sm transition-all duration-300"
-                    href="#certifications">Certs</a>
+                    href="#experience">Education</a>
+                <a class="nav-link text-slate-400 border-b-4 border-transparent hover:text-white hover:border-white/50 pb-1 font-['Public_Sans'] font-black tracking-tighter uppercase text-sm transition-all duration-300"
+                    href="#certifications">Certifications</a>
+                <a class="nav-link text-slate-400 border-b-4 border-transparent hover:text-white hover:border-white/50 pb-1 font-['Public_Sans'] font-black tracking-tighter uppercase text-sm transition-all duration-300"
+                    href="#awards">Achievements</a>
                 <a class="nav-link text-slate-400 border-b-4 border-transparent hover:text-white hover:border-white/50 pb-1 font-['Public_Sans'] font-black tracking-tighter uppercase text-sm transition-all duration-300"
                     href="#contact">Contact</a>
             </div>
@@ -62,13 +66,13 @@
         <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-12 items-center relative z-10">
             <div class="lg:col-span-8">
                 <h1
-                    class="font-headline font-black text-6xl sm:text-7xl lg:text-[6rem] leading-[0.85] tracking-tighter uppercase text-on-surface">
-                    Building Scalable <br />
-                    <span class="text-primary"> Data Pipelines </span>
+                    class="font-headline font-black text-5xl sm:text-6xl lg:text-[5rem] leading-[0.9] tracking-tighter uppercase text-on-surface">
+                    BUILDING <br />
+                    <span class="text-primary">DATA • AI • <br />SOFTWARE SYSTEMS</span>
                 </h1>
                 <p
-                    class="mt-8 lg:mt-12 text-xl lg:text-2xl max-w-2xl text-on-surface-variant font-medium leading-relaxed">
-                    3rd-year IT student focused on building ETL pipelines, data workflows, and scalable backend systems. Passionate about turning raw data into actionable insights.
+                    class="mt-6 lg:mt-8 text-lg lg:text-xl max-w-2xl text-on-surface-variant font-medium leading-relaxed">
+                    Final-year Information Technology student at SIES Graduate School of Technology with a 9.3/10 CGPA, experienced in Python, SQL, data engineering, ETL, cloud technologies, AI, and machine learning. Building practical data, AI, and software solutions through hands-on projects.
                 </p>
                 <div class="flex flex-wrap gap-4 mt-8">
                     <a href="#projects"
@@ -83,11 +87,10 @@
             <div class="lg:col-span-4 flex flex-col gap-6 w-full max-w-md">
                 <div
                     class="bg-surface-container-low p-8 border-l-8 border-primary brutal-shadow hover:translate-x-2 transition-transform duration-300">
-                    <span class="text-lg font-black tracking-[0.3em] text-primary uppercase">Current Status</span>
-                    <p class="text-2xl font-bold mt-3">Seeking Data Engineering Internship</p>
-                    <p class="text-lg text-on-surface-variant font-medium mt-3 leading-relaxed">
-                        Python • SQL • Spark • AWS
-                        Available from June 2026
+                    <span class="text-lg font-black tracking-[0.3em] text-primary uppercase">CURRENT FOCUS</span>
+                    <p class="text-2xl font-bold mt-3 uppercase tracking-wider">DATA • AI • SOFTWARE</p>
+                    <p class="text-sm text-on-surface-variant font-bold mt-3 leading-relaxed tracking-widest uppercase">
+                        Python · SQL · ETL · Cloud · AI · ML
                     </p>
                 </div>
                 <div class="bg-surface-container-highest p-8 brutal-shadow relative overflow-hidden group">
@@ -97,8 +100,8 @@
                     <div class="relative z-10">
                         <span class="material-symbols-outlined text-5xl text-tertiary-container mb-4">location_on</span>
                         <p class="text-base text-on-surface-variant leading-tight font-bold tracking-wider uppercase">
-                            Open to work in</p>
-                        <p class="text-2xl text-white font-black uppercase mt-2">Navi Mumbai / Mumbai, India</p>
+                            BASED IN</p>
+                        <p class="text-2xl text-white font-black uppercase mt-2">NAVI MUMBAI, INDIA</p>
                     </div>
                 </div>
             </div>
@@ -124,23 +127,27 @@
                 <span class="text-primary font-black uppercase tracking-widest text-5xl mb-4 block">About Me</span>
                 <h2
                     class="font-headline font-black text-4xl md:text-5xl lg:text-5xl uppercase tracking-tighter leading-none mb-8 md:mb-12">
-                    Data Engineer <br /><span class="text-white">in Progress </span>
+                    BUILDING ACROSS <br /><span class="text-white">DATA, AI & SOFTWARE</span>
                 </h2>
                 <div class="space-y-6 md:space-y-8 text-base md:text-lg text-on-surface-variant leading-relaxed">
-                    <p>I’m a 3rd-year IT undergraduate at <span class="text-white font-bold">SIES Graduate School of Technology</span>, focused on building scalable data systems and real-world ETL pipelines.</p>
+                    <p>I'm a final-year Information Technology student at <span class="text-white font-bold">SIES Graduate School of Technology</span> with a 9.3/10 CGPA, focused on building practical solutions across software development, data engineering, artificial intelligence, machine learning, and cloud technologies.</p>
 
-                    <p>I work on transforming raw data into meaningful insights by designing data pipelines, optimizing workflows, and handling large datasets efficiently.</p>
+                    <p>I work with Python, SQL, ETL, PySpark, Azure, Databricks, RAG, LangGraph, and LangChain. My projects include semantic learning systems, cloud-based data pipelines, and multi-agent AI applications.</p>
 
-                    <p>My core stack includes Python, SQL, and cloud technologies, helping bridge the gap between raw data and actionable intelligence.</p>
+                    <p>I enjoy transforming technical concepts into practical systems and continuously expanding my skills across data, AI, and software engineering.</p>
 
-                    <div class="grid grid-cols-2 gap-4 md:gap-8 pt-8 border-t border-white/10">
+                    <div class="grid grid-cols-3 gap-4 md:gap-8 pt-8 border-t border-white/10">
                         <div>
-                            <span class="block text-4xl lg:text-5xl font-black text-primary mb-2">3+</span>
-                            <span class="text-xs uppercase tracking-widest font-black block">Core Projects</span>
+                            <span class="block text-4xl lg:text-5xl font-black text-primary mb-2">9.3</span>
+                            <span class="text-xs uppercase tracking-widest font-black block">CGPA / 10</span>
                         </div>
                         <div>
-                            <span class="block text-4xl lg:text-5xl font-black text-primary mb-2">5+</span>
-                            <span class="text-xs uppercase tracking-widest font-black block">Certifications</span>
+                            <span class="block text-4xl lg:text-5xl font-black text-primary mb-2">3</span>
+                            <span class="text-xs uppercase tracking-widest font-black block">PROJECTS</span>
+                        </div>
+                        <div>
+                            <span class="block text-4xl lg:text-5xl font-black text-primary mb-2">2</span>
+                            <span class="text-xs uppercase tracking-widest font-black block">CERTIFICATIONS</span>
                         </div>
                     </div>
                 </div>
@@ -159,145 +166,84 @@
                     <span class="w-12 h-1 bg-primary inline-block"></span> Selected Works
                 </p>
             </div>
+            <div class="flex flex-col gap-8">
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-                <!-- Main Project -->
-                <div
-                    class="lg:col-span-8 bg-surface-container-low group relative overflow-hidden h-[400px] md:h-[500px] lg:h-[600px] border border-white/5 hover:border-primary/30 transition-colors">
-                    <div
-                        class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10">
+                <!-- Project 1 — Memora -->
+                <div class="bg-surface-container-low flex flex-col md:flex-row group border border-white/5 hover:border-primary/30 transition-colors brutal-shadow overflow-hidden">
+                    <div class="bg-primary/10 border-b md:border-b-0 md:border-r border-primary/20 p-6 md:p-8 flex flex-col items-center justify-center md:min-w-[140px] shrink-0">
+                        <span class="text-5xl font-black text-primary/40 font-headline leading-none">01</span>
+                        <span class="bg-primary/20 text-primary border border-primary/30 px-3 py-1 font-black uppercase tracking-widest text-[10px] mt-4">AI &amp; RAG</span>
                     </div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-[#000] via-[#131313]/50 to-transparent z-10">
-                    </div>
-                    <img class="absolute inset-0 w-full h-full object-cover grayscale opacity-80 group-hover:scale-105 group-hover:opacity-50 transition-all duration-700"
-                        alt="RAG AI System Visual"
-                        src="asset/rag_ai.png" />
-
-                    <div class="absolute bottom-0 left-0 p-8 md:p-12 w-full z-20">
-                        <div class="flex gap-3 mb-4 flex-wrap">
-                            <span
-                                class="bg-primary/20 text-primary border border-primary/30 px-3 py-1 font-black uppercase tracking-widest text-[10px]">AI Infrastructure</span>
-                            <span
-                                class="bg-white/5 text-white border border-white/10 px-3 py-1 font-black uppercase tracking-widest text-[10px]">RAG & LLM</span>
+                    <div class="p-8 md:p-10 flex-1">
+                        <div class="flex items-center gap-3 mb-4">
+                            <h3 class="text-2xl font-headline font-black text-white uppercase">MEMORA SEMANTIC LEARNING SYSTEM</h3>
+                            <span class="text-[10px] text-outline font-black uppercase tracking-widest px-3 py-1 border border-white/10 shrink-0 hidden sm:inline-block">Sep 2025 – Jun 2026</span>
                         </div>
-                        <h3
-                            class="text-3xl md:text-4xl lg:text-5xl font-headline font-black text-white uppercase mb-4 leading-none">
-                            RAG BASED AI TEACHING ASSISTANT</h3>
-                        <p class="text-on-surface-variant max-w-xl mb-8 md:mb-12 text-xl md:text-xl">Transformed educational videos into a searchable knowledge base using RAG, embeddings, and LLMs, enabling precise question-answering with relevant timestamp retrieval.</p>
+                        <p class="text-sm text-on-surface-variant leading-relaxed mb-6">Developed an AI-powered semantic learning assistant using Retrieval-Augmented Generation. Built an intelligent document retrieval pipeline for educational content, enabling semantic search and contextual responses using vector embeddings.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">RAG</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">Semantic Search</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">Vector Embeddings</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">Document Retrieval</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">AI</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Secondary Project 1 -->
-                <div
-                    class="lg:col-span-4 bg-surface-container-highest p-8 md:p-10 flex flex-col justify-between group border border-white/5 hover:border-primary/30 transition-colors">
-                    <div>
-                        <span
-                            class="bg-tertiary-container/10 text-tertiary-container px-3 py-1 font-black uppercase tracking-widest text-[10px] mb-6 inline-block">Machine
-                            Learning</span>
-                        <h3 class="text-2xl md:text-3xl font-headline font-black text-white uppercase mb-4">
-                            RAINFALL<br />FORECASTING</h3>
-                        <p class="text-sm text-on-surface-variant mb-6 leading-relaxed">Engineered a Machine Learning
-                            model specifically optimized for accurate prediction of rainfall patterns based on
-                            historical datasets.</p>
+                <!-- Project 2 — Agentic AI -->
+                <div class="bg-surface-container-highest flex flex-col md:flex-row group border border-white/5 hover:border-primary/30 transition-colors brutal-shadow overflow-hidden">
+                    <div class="bg-tertiary-container/5 border-b md:border-b-0 md:border-r border-tertiary-container/20 p-6 md:p-8 flex flex-col items-center justify-center md:min-w-[140px] shrink-0">
+                        <span class="text-5xl font-black text-tertiary-container/40 font-headline leading-none">02</span>
+                        <span class="bg-tertiary-container/10 text-tertiary-container border border-tertiary-container/20 px-3 py-1 font-black uppercase tracking-widest text-[10px] mt-4">Agentic AI</span>
                     </div>
-                    <div
-                        class="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-primary group-hover:text-on-primary group-hover:border-primary transition-all self-end">
-                        <span class="material-symbols-outlined text-sm">arrow_forward_ios</span>
-                    </div>
-                </div>
-
-                <!-- Secondary Project 2 -->
-                <div
-                    class="lg:col-span-12 bg-surface-container-high p-8 md:p-12 flex flex-col md:flex-row gap-8 items-center justify-between group border-l-4 border-primary hover:bg-[#202020] transition-colors">
-                    <div class="flex-grow max-w-3xl">
-                        <span
-                            class="text-outline-variant font-black uppercase tracking-widest text-xs block mb-4">Machine
-                            Learning</span>
-                        <h3 class="text-2xl md:text-4xl font-headline font-black text-white uppercase mb-4">PRICE
-                            PREDICTION MODEL</h3>
-                        <p class="text-base text-on-secondary-container">Developed a predictive learning model analyzing
-                            market indicators to deliver precise price estimations.</p>
-                    </div>
-                    <div class="shrink-0">
-                        <button
-                            class="bg-white/5 text-white hover:bg-white hover:text-black border border-white/20 px-8 py-4 font-black uppercase text-xs tracking-widest transition-all">Details</button>
+                    <div class="p-8 md:p-10 flex-1">
+                        <div class="flex items-center gap-3 mb-4">
+                            <h3 class="text-2xl font-headline font-black text-white uppercase">SPOTIFY END-TO-END DATA ENGINEERING PIPELINE</h3>
+                            <span class="text-[10px] text-outline font-black uppercase tracking-widest px-3 py-1 border border-white/10 shrink-0 hidden sm:inline-block">Jul 2026 – Present</span>
+                        </div>
+                        <p class="text-sm text-on-surface-variant leading-relaxed mb-6">Developed a parameterized, metadata-driven ingestion pipeline using Azure Data Factory to move data into Azure Data Lake Storage Gen2. Implemented incremental loading and backfilling, and structured data using a Bronze/Silver/Gold medallion architecture with Azure Databricks and PySpark.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">Azure Data Factory</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">Azure Data Lake Storage Gen2</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">Azure Databricks</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">PySpark</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">ETL</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">Incremental Loading</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">Backfilling</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">Medallion Architecture</span>
+                        </div>
                     </div>
                 </div>
 
-            </div>
-        </div>
-    </section>
-
-    <!-- Data Engineering Stack Section -->
-    <section class="py-24 md:py-32 px-6 md:px-12 bg-surface-container-lowest border-y border-white/5" id="tech-stack">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-16 md:mb-24">
-                <h2
-                    class="font-headline font-black text-4xl md:text-5xl lg:text-7xl uppercase tracking-tighter text-white mb-6">
-                    TECH STACK</h2>
-                <p class="text-on-surface-variant font-medium text-lg md:text-xl max-w-2xl mx-auto">
-                    Designing scalable cloud-native data pipelines using Azure & PySpark.
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-outline-variant/20">
-                <!-- Stack Box 1 -->
-                <div
-                    class="bg-surface p-10 md:p-12 text-center flex flex-col items-center justify-center min-h-[250px] group hover:bg-surface-container-high transition-colors relative overflow-hidden">
-                    <div
-                        class="absolute inset-x-0 bottom-0 h-1 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300">
+                <!-- Project 3 — Spotify Pipeline -->
+                <div class="bg-surface-container-high flex flex-col md:flex-row group border border-white/5 hover:border-primary/30 transition-colors brutal-shadow overflow-hidden">
+                    <div class="bg-primary/5 border-b md:border-b-0 md:border-r border-primary/20 p-6 md:p-8 flex flex-col items-center justify-center md:min-w-[140px] shrink-0">
+                        <span class="text-5xl font-black text-primary/40 font-headline leading-none">03</span>
+                        <span class="bg-primary/10 text-primary border border-primary/20 px-3 py-1 font-black uppercase tracking-widest text-[10px] mt-4">Data Eng</span>
                     </div>
-                    <span class="text-4xl md:text-5xl font-black text-primary/30 mb-6 font-headline">01</span>
-                    <span
-                        class="text-[10px] md:text-xs font-black uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2"><span
-                            class="w-2 h-2 rounded-full bg-primary inline-block"></span> INGEST</span>
-                    <h4 class="text-lg md:text-xl font-headline font-black text-white uppercase">APIs / EVENT STREAMS<br /><span
-                            class="text-sm mt-2 block text-outline">AZURE DATA FACTORY</span></h4>
+                    <div class="p-8 md:p-10 flex-1">
+                        <div class="flex items-center gap-3 mb-4">
+                            <h3 class="text-2xl font-headline font-black text-white uppercase">AGENTIC AI DATA ANALYST & ETL AUTOMATION AGENT</h3>
+                            <span class="text-[10px] text-outline font-black uppercase tracking-widest px-3 py-1 border border-white/10 shrink-0 hidden sm:inline-block">Sep 2026</span>
+                        </div>
+                        <p class="text-sm text-on-surface-variant leading-relaxed mb-6">Developed a multi-agent architecture with specialized SQL and ETL agents and an LLM-based router for natural-language data requests. Built a 7-stage SQL workflow covering question curation, schema discovery, SQL generation, AI safety validation, PostgreSQL execution, and response generation. Implemented tool-driven ETL workflows supporting API extraction and Pandas transformations with CSV, JSON, and Parquet outputs.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">LangGraph</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">LangChain</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">LLM</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">SQL</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">PostgreSQL</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">ETL</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">Pandas</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">API Extraction</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">CSV</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">JSON</span>
+                            <span class="bg-surface-container-lowest px-3 py-1 text-[10px] font-black uppercase tracking-widest text-on-surface-variant border border-white/10">Parquet</span>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Stack Box 2 -->
-                <div
-                    class="bg-surface p-10 md:p-12 text-center flex flex-col items-center justify-center min-h-[250px] group hover:bg-surface-container-high transition-colors relative overflow-hidden">
-                    <div
-                        class="absolute inset-x-0 bottom-0 h-1 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300">
-                    </div>
-                    <span class="text-4xl md:text-5xl font-black text-primary/30 mb-6 font-headline">02</span>
-                    <span
-                        class="text-[10px] md:text-xs font-black uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2"><span
-                            class="w-2 h-2 rounded-full bg-primary inline-block"></span> ORCHESTRATION</span>
-                    <h4 class="text-lg md:text-xl font-headline font-black text-white uppercase">APACHE AIRFLOW<br /><span
-                            class="text-sm mt-2 block text-outline">ADF PIPELINES / AUTOMATION</span></h4>
-                </div>
-
-                <!-- Stack Box 3 -->
-                <div
-                    class="bg-surface p-10 md:p-12 text-center flex flex-col items-center justify-center min-h-[250px] group hover:bg-surface-container-high transition-colors relative overflow-hidden">
-                    <div
-                        class="absolute inset-x-0 bottom-0 h-1 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300">
-                    </div>
-                    <span class="text-4xl md:text-5xl font-black text-primary/30 mb-6 font-headline">03</span>
-                    <span
-                        class="text-[10px] md:text-xs font-black uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2"><span
-                            class="w-2 h-2 rounded-full bg-primary inline-block"></span> PROCESSING</span>
-                    <h4 class="text-lg md:text-xl font-headline font-black text-white uppercase">PYSPARK / DATABRICKS<br /><span
-                            class="text-sm mt-2 block text-outline">DATA TRANSFORMATION</span></h4>
-                </div>
-
-                <!-- Stack Box 4 -->
-                <div
-                    class="bg-surface p-10 md:p-12 text-center flex flex-col items-center justify-center min-h-[250px] group hover:bg-surface-container-high transition-colors relative overflow-hidden">
-                    <div
-                        class="absolute inset-x-0 bottom-0 h-1 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300">
-                    </div>
-                    <span class="text-4xl md:text-5xl font-black text-primary/30 mb-6 font-headline">04</span>
-                    <span
-                        class="text-[10px] md:text-xs font-black uppercase tracking-widest text-on-surface-variant mb-4 flex items-center gap-2"><span
-                            class="w-2 h-2 rounded-full bg-primary inline-block"></span> STORAGE & SERVING</span>
-                    <h4 class="text-lg md:text-xl font-headline font-black text-white uppercase">ADLS GEN2 / AZURE SQL<br /><span
-                            class="text-sm mt-2 block text-outline">POWER BI / POSTGRESQL</span></h4>
-                </div>
-            </div>
+            </div>    </div>
         </div>
     </section>
 
@@ -305,47 +251,58 @@
     <section class="py-24 md:py-32 px-6 md:px-12 bg-surface-container-low border-b border-white/5" id="skills">
         <div class="max-w-7xl mx-auto">
             <h2 class="font-headline font-black text-4xl md:text-5xl lg:text-7xl uppercase tracking-tighter text-white mb-16 md:mb-20">
-                CORE SKILLS
+                SKILLS
             </h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Column 1 -->
-                <div class="bg-surface-container-lowest p-8 border-t-4 border-primary hover:-translate-y-2 transition-transform duration-300 brutal-shadow">
-                    <h4 class="text-xl font-black uppercase text-primary mb-6 flex items-center gap-3"><span class="material-symbols-outlined text-outline">code</span> Languages</h4>
-                    <ul class="space-y-4 text-on-surface-variant font-bold tracking-wide uppercase text-sm">
+            <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+                <!-- Column 1: Programming -->
+                <div class="bg-surface-container-lowest p-6 md:p-8 border-t-4 border-primary hover:-translate-y-2 transition-transform duration-300 brutal-shadow">
+                    <h4 class="text-lg font-black uppercase text-primary mb-6 flex items-center gap-3"><span class="material-symbols-outlined text-outline">code</span> Programming</h4>
+                    <ul class="space-y-4 text-on-surface-variant font-bold tracking-wide uppercase text-xs md:text-sm">
                         <li><span class="text-white">Python</span></li>
                         <li><span class="text-white">SQL</span></li>
-                        <li>C / C++</li>
-                        <li>HTML / CSS</li>
                     </ul>
                 </div>
-                <!-- Column 2 -->
-                <div class="bg-surface-container-lowest p-8 border-t-4 border-primary hover:-translate-y-2 transition-transform duration-300 brutal-shadow">
-                    <h4 class="text-xl font-black uppercase text-primary mb-6 flex items-center gap-3"><span class="material-symbols-outlined text-outline">analytics</span> ML & Data</h4>
-                    <ul class="space-y-4 text-on-surface-variant font-bold tracking-wide uppercase text-sm">
-                        <li><span class="text-white">Pandas / NumPy</span></li>
-                        <li><span class="text-white">Scikit-Learn</span></li>
-                        <li>Data Visualization</li>
-                        <li>NLP / Regression</li>
+                <!-- Column 2: Data Engineering -->
+                <div class="bg-surface-container-lowest p-6 md:p-8 border-t-4 border-primary hover:-translate-y-2 transition-transform duration-300 brutal-shadow">
+                    <h4 class="text-lg font-black uppercase text-primary mb-6 flex items-center gap-3"><span class="material-symbols-outlined text-outline">schema</span> Data Engineering</h4>
+                    <ul class="space-y-4 text-on-surface-variant font-bold tracking-wide uppercase text-xs md:text-sm">
+                        <li><span class="text-white">ETL</span></li>
+                        <li>PySpark</li>
+                        <li>Azure Data Factory</li>
+                        <li>Azure Data Lake</li>
+                        <li>Databricks</li>
+                        <li>Incremental Loading</li>
+                        <li>Backfilling</li>
                     </ul>
                 </div>
-                <!-- Column 3 -->
-                <div class="bg-surface-container-lowest p-8 border-t-4 border-primary hover:-translate-y-2 transition-transform duration-300 brutal-shadow">
-                    <h4 class="text-xl font-black uppercase text-primary mb-6 flex items-center gap-3"><span class="material-symbols-outlined text-outline">cloud</span> Tools & Tech</h4>
-                    <ul class="space-y-4 text-on-surface-variant font-bold tracking-wide uppercase text-sm">
-                        <li><span class="text-white">Azure Databricks</span></li>
-                        <li><span class="text-white">Apache Airflow</span></li>
-                        <li>Git / GitHub</li>
-                        <li>Jupyter / VS Code</li>
+                <!-- Column 3: AI / Generative AI -->
+                <div class="bg-surface-container-lowest p-6 md:p-8 border-t-4 border-primary hover:-translate-y-2 transition-transform duration-300 brutal-shadow">
+                    <h4 class="text-lg font-black uppercase text-primary mb-6 flex items-center gap-3"><span class="material-symbols-outlined text-outline">psychology</span> AI / GenAI</h4>
+                    <ul class="space-y-4 text-on-surface-variant font-bold tracking-wide uppercase text-xs md:text-sm">
+                        <li><span class="text-white">RAG</span></li>
+                        <li>LangGraph</li>
+                        <li>LangChain</li>
+                        <li>Agentic AI</li>
                     </ul>
                 </div>
-                <!-- Column 4 -->
-                <div class="bg-surface-container-lowest p-8 border-t-4 border-primary hover:-translate-y-2 transition-transform duration-300 brutal-shadow">
-                    <h4 class="text-xl font-black uppercase text-primary mb-6 flex items-center gap-3"><span class="material-symbols-outlined text-outline">psychology</span> Soft Skills</h4>
-                    <ul class="space-y-4 text-on-surface-variant font-bold tracking-wide uppercase text-sm">
-                        <li><span class="text-white">Problem Solving</span></li>
-                        <li><span class="text-white">Leadership</span></li>
-                        <li>Teamwork</li>
-                        <li>Communication</li>
+                <!-- Column 4: Data / Development -->
+                <div class="bg-surface-container-lowest p-6 md:p-8 border-t-4 border-primary hover:-translate-y-2 transition-transform duration-300 brutal-shadow">
+                    <h4 class="text-lg font-black uppercase text-primary mb-6 flex items-center gap-3"><span class="material-symbols-outlined text-outline">terminal</span> Data / Dev</h4>
+                    <ul class="space-y-4 text-on-surface-variant font-bold tracking-wide uppercase text-xs md:text-sm">
+                        <li><span class="text-white">Pandas</span></li>
+                        <li>NumPy</li>
+                        <li>Flask</li>
+                        <li>Git</li>
+                        <li>GitHub</li>
+                    </ul>
+                </div>
+                <!-- Column 5: Core Subjects -->
+                <div class="bg-surface-container-lowest p-6 md:p-8 border-t-4 border-primary hover:-translate-y-2 transition-transform duration-300 brutal-shadow">
+                    <h4 class="text-lg font-black uppercase text-primary mb-6 flex items-center gap-3"><span class="material-symbols-outlined text-outline">school</span> Core Subjects</h4>
+                    <ul class="space-y-4 text-on-surface-variant font-bold tracking-wide uppercase text-xs md:text-sm">
+                        <li><span class="text-white">OOPS</span></li>
+                        <li><span class="text-white">DSA</span></li>
+                        <li><span class="text-white">DBMS</span></li>
                     </ul>
                 </div>
             </div>
@@ -370,26 +327,24 @@
                     <div class="space-y-6">
                         <div
                             class="bg-surface-container-low p-8 md:p-10 border-l-4 border-primary hover:bg-surface-container-high transition-colors group">
-                            <span class="text-xs font-black text-outline uppercase tracking-widest block mb-4">June 2025
-                                - July 2025</span>
+                            <span class="text-xs font-black text-outline uppercase tracking-widest block mb-4">Jun 2025 – Jul 2025</span>
                             <h4 class="text-2xl font-black uppercase mb-1">Data Science Intern</h4>
-                            <p class="text-primary font-bold uppercase tracking-widest text-sm mb-6">Reva Technologies /
-                                Panvel</p>
+                            <p class="text-primary font-bold uppercase tracking-widest text-sm mb-6">Reva Technologies</p>
                             <ul class="space-y-3 text-on-surface-variant text-sm md:text-base">
-                                <li class="flex gap-3"><span class="text-primary font-bold mt-1">›</span> Developed LSTM
-                                    model using 40+ years of climate data.</li>
-                                <li class="flex gap-3"><span class="text-primary font-bold mt-1">›</span> Forecasted
-                                    long-term trends with 90%+ accuracy vs baseline models.</li>
+                                <li class="flex gap-3"><span class="text-primary font-bold mt-1">›</span> Analysed climate datasets using Python and SQL for rainfall forecasting.</li>
+                                <li class="flex gap-3"><span class="text-primary font-bold mt-1">›</span> Built and evaluated machine learning models for weather prediction.</li>
+                                <li class="flex gap-3"><span class="text-primary font-bold mt-1">›</span> Performed data preprocessing and feature engineering to improve prediction accuracy.</li>
                             </ul>
                         </div>
 
                         <div
                             class="bg-surface-container-low p-8 md:p-10 border-l-4 border-primary hover:bg-surface-container-high transition-colors group">
-                            <span class="text-xs font-black text-outline uppercase tracking-widest block mb-4">July 2024
-                                - July 2025</span>
-                            <h4 class="text-xl font-black uppercase mb-1">Class Representative</h4>
-                            <p class="text-primary font-bold uppercase tracking-widest text-sm">SIES Graduate
-                                School Of Technology</p>
+                            <h4 class="text-xl font-black uppercase mb-1">Leadership / Co-Curricular</h4>
+                            <p class="text-primary font-bold uppercase tracking-widest text-sm mb-4">SIES Graduate School Of Technology</p>
+                            <ul class="space-y-3 text-on-surface-variant text-sm md:text-base">
+                                <li class="flex gap-3"><span class="text-primary font-bold mt-1">›</span> <strong>Student Council, Class Representative</strong> (Jul 2024 – May 2025). Led coordination between students and faculty.</li>
+                                <li class="flex gap-3"><span class="text-primary font-bold mt-1">›</span> <strong>NSS Volunteer</strong> (Aug 2023 – Aug 2024). Participated in community service and social activities.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -417,7 +372,7 @@
                                 <h4 class="text-lg font-black uppercase mb-1">BE in Information Technology</h4>
                                 <p class="text-sm font-bold text-on-surface-variant mb-4">SIES Graduate School Of
                                     Technology</p>
-                                <div class="inline-block bg-primary/20 text-primary px-3 py-1 font-black text-[10px] uppercase tracking-widest border border-primary/30">CGPA: 9.19</div>
+                                <div class="inline-block bg-primary/20 text-primary px-3 py-1 font-black text-[10px] uppercase tracking-widest border border-primary/30">CGPA: 9.3 / 10</div>
                             </div>
                         </div>
 
@@ -447,7 +402,7 @@
                             </div>
                             <div class="bg-surface-container-low p-6 md:p-8 md:ml-12 border-l-4 border-primary hover:bg-surface-container-high transition-colors group brutal-shadow">
                                 <span
-                                    class="text-[10px] font-black uppercase tracking-widest text-primary mb-2 block">Earlier</span>
+                                    class="text-[10px] font-black uppercase tracking-widest text-primary mb-2 block">May 2020 – Aug 2021</span>
                                 <h4 class="text-base font-black uppercase mb-1">High School</h4>
                                 <p class="text-sm font-bold text-on-surface-variant mb-4">St. Xavier's High School &
                                     Junior College, Nerul</p>
@@ -512,48 +467,46 @@
                     </div>
                 </div>
 
-                <!-- Cert 4 -->
-                <div class="bg-surface group relative overflow-hidden border border-white/5 hover:border-primary/50 transition-colors brutal-shadow">
-                    <div class="aspect-[4/3] bg-surface-container-highest relative overflow-hidden">
-                        <!-- Replace src with your IBM certificate image -->
-                        <img src="asset/Python for Data Science, AI & Development.jpg" alt="Python for Data Science" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500" />
-                        <div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    </div>
-                    <div class="p-6 md:p-8">
-                        <span class="text-[10px] font-black uppercase tracking-widest text-primary mb-2 block flex items-center gap-2"><span class="material-symbols-outlined text-[14px]">verified</span> Coursera</span>
-                        <h4 class="text-xl font-black uppercase mb-2 text-white leading-tight">Python for Data Science, AI & Development</h4>
-                        <p class="text-sm font-bold text-on-surface-variant">IBM</p>
-                    </div>
-                </div>
+            </div>
+        </div>
+    </section>
 
-                <!-- Cert 5 -->
-                <div class="bg-surface group relative overflow-hidden border border-white/5 hover:border-primary/50 transition-colors brutal-shadow">
-                    <div class="aspect-[4/3] bg-surface-container-highest relative overflow-hidden">
-                        <!-- Replace src with your Google certificate image -->
-                        <img src="asset/Foundation of Data.jpg" alt="Foundations: Data, Data, Everywhere" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500" />
-                        <div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+    <!-- Awards & Achievements Section -->
+    <section class="py-24 md:py-32 px-6 md:px-12 bg-surface border-t border-white/5" id="awards">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center gap-6 mb-16 md:mb-20">
+                <h2 class="font-headline font-black text-4xl md:text-5xl lg:text-7xl uppercase tracking-tighter">
+                    AWARDS &amp; <span class="text-outline-variant">ACHIEVEMENTS</span></h2>
+                <div class="hidden md:block h-2 flex-grow bg-surface-container-highest"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Award 1 -->
+                <div class="bg-surface-container-low p-8 md:p-10 border-l-8 border-primary hover:bg-surface-container-high transition-colors group brutal-shadow">
+                    <div class="flex items-start gap-4 mb-4">
+                        <span class="material-symbols-outlined text-4xl text-primary">emoji_events</span>
+                        <div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-outline block mb-1">Cognition 2025</span>
+                            <h4 class="text-2xl font-black uppercase text-white">Second Prize</h4>
+                        </div>
                     </div>
-                    <div class="p-6 md:p-8">
-                        <span class="text-[10px] font-black uppercase tracking-widest text-primary mb-2 block flex items-center gap-2"><span class="material-symbols-outlined text-[14px]">verified</span> Coursera</span>
-                        <h4 class="text-xl font-black uppercase mb-2 text-white leading-tight">Foundations: Data, Data, Everywhere</h4>
-                        <p class="text-sm font-bold text-on-surface-variant">Google</p>
-                    </div>
+                    <ul class="space-y-3 text-on-surface-variant text-sm md:text-base">
+                        <li class="flex gap-3"><span class="text-primary font-bold mt-1">›</span> Secured Second Prize among competing teams.</li>
+                        <li class="flex gap-3"><span class="text-primary font-bold mt-1">›</span> Led end-to-end planning and execution of an AI-powered healthcare platform, presenting the solution before judges and faculty.</li>
+                    </ul>
                 </div>
-
-                <!-- Cert 6 -->
-                <div class="bg-surface group relative overflow-hidden border border-white/5 hover:border-primary/50 transition-colors brutal-shadow">
-                    <div class="aspect-[4/3] bg-surface-container-highest relative overflow-hidden">
-                        <!-- Replace src with your SIES certificate image -->
-                        <img src="asset/What is Data Science.jpg" alt="What is Data Science" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500" />
-                        <div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <!-- Personal Details card -->
+                <div class="bg-surface-container-low p-8 md:p-10 border-l-8 border-outline-variant hover:bg-surface-container-high transition-colors group brutal-shadow">
+                    <div class="flex items-start gap-4 mb-6">
+                        <span class="material-symbols-outlined text-4xl text-outline">person</span>
+                        <h4 class="text-2xl font-black uppercase text-white">Personal Details</h4>
                     </div>
-                    <div class="p-6 md:p-8">
-                        <span class="text-[10px] font-black uppercase tracking-widest text-primary mb-2 block flex items-center gap-2"><span class="material-symbols-outlined text-[14px]">verified</span> IBM</span>
-                        <h4 class="text-xl font-black uppercase mb-2 text-white leading-tight">What is Data Science</h4>
-                        <p class="text-sm font-bold text-on-surface-variant">IBM</p>
-                    </div>
+                    <ul class="space-y-4 text-sm">
+                        <li class="flex justify-between border-b border-white/5 pb-3"><span class="text-on-surface-variant font-bold uppercase tracking-widest">Date of Birth</span><span class="text-white font-bold">15 Sep 2005</span></li>
+                        <li class="flex justify-between border-b border-white/5 pb-3"><span class="text-on-surface-variant font-bold uppercase tracking-widest">Gender</span><span class="text-white font-bold">Male</span></li>
+                        <li class="flex justify-between border-b border-white/5 pb-3"><span class="text-on-surface-variant font-bold uppercase tracking-widest">Location</span><span class="text-white font-bold">Nerul, Navi Mumbai</span></li>
+                        <li class="flex justify-between"><span class="text-on-surface-variant font-bold uppercase tracking-widest">Languages</span><span class="text-white font-bold">Hindi · English · Marathi</span></li>
+                    </ul>
                 </div>
-
             </div>
         </div>
     </section>
@@ -577,7 +530,7 @@
                 <div class="space-y-6">
 
 
-                    <a href="https://www.linkedin.com/in/yashrajrr" target="_blank"
+                    <a href="https://www.linkedin.com/in/yashrajrr" target="_blank" rel="noopener noreferrer"
                         class="flex items-center gap-6 group">
                         <div
                             class="w-14 h-14 bg-surface-container-highest flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors brutal-shadow">
@@ -588,7 +541,7 @@
                             class="text-lg md:text-xl font-bold font-headline uppercase">linkedin.com/in/yashrajrr</span>
                     </a>
 
-                    <a href="https://github.com/yashrajrr" target="_blank"
+                    <a href="https://github.com/yashrajrr" target="_blank" rel="noopener noreferrer"
                         class="flex items-center gap-6 group">
                         <div
                             class="w-14 h-14 bg-surface-container-highest flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors brutal-shadow">
@@ -669,14 +622,14 @@
         class="w-full px-6 py-12 md:py-16 flex flex-col items-center gap-8 bg-[#0E0E0E] text-center border-t border-white/10">
         <div
             class="text-xl md:text-2xl font-black text-white font-['Public_Sans'] uppercase tracking-widest text-primary">
-            YASHRAJ_RATHOR [PORTFOLIO]
+            YASHRAJ RATHOR
         </div>
 
         <div class="flex flex-wrap justify-center gap-8">
             <a class="text-on-surface-variant hover:text-white transition-colors font-['Inter'] text-xs font-bold tracking-[0.2em] uppercase"
-                href="https://www.linkedin.com/in/yashrajrr" target="_blank">LinkedIn</a>
+                href="https://www.linkedin.com/in/yashrajrr" target="_blank" rel="noopener noreferrer">LinkedIn</a>
             <a class="text-on-surface-variant hover:text-white transition-colors font-['Inter'] text-xs font-bold tracking-[0.2em] uppercase"
-                href="https://github.com/yashrajrr" target="_blank">GitHub</a>
+                href="https://github.com/yashrajrr" target="_blank" rel="noopener noreferrer">GitHub</a>
 
             <a class="text-on-surface-variant hover:text-white transition-colors font-['Inter'] text-xs font-bold tracking-[0.2em] uppercase"
                 href="#home">Back to Top</a>
