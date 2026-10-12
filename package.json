@@ -1,0 +1,13 @@
+{
+  "name": "yashraj-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Yashraj Rathor's public portfolio with an authenticated Supabase editor.",
+  "scripts": {
+    "build": "node build.mjs && tailwindcss -i ./style.css -o ./dist/style.css --minify",
+    "check": "node --check main.js && node --check admin.js && node --check appearance.js && node --check content-store.js && node --check content.js && node --check supabase-client.js && node --check api/config.js"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}

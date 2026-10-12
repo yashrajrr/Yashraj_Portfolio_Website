@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Authenticated shared portfolio content editor">
+    <title>Portfolio Admin Editor | Yashraj Rathor</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --admin-bg: var(--surface, #101014);
+            --admin-sidebar: var(--panel, #15151b);
+            --admin-panel: var(--panel, #1d1d25);
+            --admin-panel-high: var(--raised, #292932);
+            --admin-panel-low: var(--surface, #18181f);
+            --admin-text: var(--ink, #f5f3ff);
+            --admin-muted: var(--muted, #aaa8ba);
+            --admin-primary: var(--accent, #bebfff);
+            --admin-primary-ink: var(--accent-ink, #17123e);
+            --admin-danger: #ff958d;
+            --admin-success: #a7e7ad;
+            --admin-border: var(--border, #3b3b49);
+            --admin-shadow: 8px 8px 0 rgba(128, 131, 255, .16);
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        .admin-body { background: var(--admin-bg); color: var(--admin-text); font-family: var(--body-font, Inter), Arial, sans-serif; margin: 0; min-height: 100vh; }
+        .admin-body h1, .admin-body h2, .admin-body h3, .admin-body h4, .admin-brand strong { font-family: var(--heading-font, var(--body-font, Inter)), Arial, sans-serif; }
+        .admin-app { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: 100vh; }
+        .admin-sidebar { background: var(--admin-sidebar); border-right: 1px solid var(--admin-border); padding: 24px 14px; position: sticky; top: 0; height: 100vh; }
+        .admin-brand { border-left: 5px solid var(--admin-primary); margin: 0 8px 28px; padding: 2px 0 2px 13px; }
+        .admin-brand strong, .admin-brand span { display: block; }
+        .admin-brand strong { font-size: 1.05rem; letter-spacing: .08em; text-transform: uppercase; }
+        .admin-brand span, .admin-kicker, .admin-label, .admin-nav-label { color: var(--admin-muted); font-size: .67rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+        .admin-brand span { margin-top: 7px; }
+        .admin-nav-title { color: var(--admin-muted); font-size: .66rem; font-weight: 900; letter-spacing: .14em; margin: 0 11px 8px; text-transform: uppercase; }
+        .admin-nav { display: grid; gap: 3px; }
+        .admin-nav-button { align-items: center; background: transparent; border: 0; color: var(--admin-muted); cursor: pointer; display: flex; font: 800 .78rem/1.2 var(--body-font, Inter), Arial, sans-serif; gap: 10px; padding: 11px 12px; text-align: left; width: 100%; }
+        .admin-nav-button:hover, .admin-nav-button:focus-visible, .admin-nav-button.is-active { background: var(--admin-panel-high); color: var(--admin-text); outline: 0; }
+        .admin-nav-button.is-active { box-shadow: inset 4px 0 var(--admin-primary); color: var(--admin-primary); }
+        .admin-nav-index { color: var(--admin-primary); font-size: .66rem; min-width: 19px; }
+        .admin-main { min-width: 0; padding: 28px clamp(16px, 4vw, 52px) 70px; }
+        .admin-topbar { align-items: center; display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; margin-bottom: 26px; }
+        .admin-topbar h1 { font-size: clamp(2rem, 5vw, 4.2rem); line-height: .92; margin: 4px 0 0; text-transform: uppercase; }
+        .admin-dirty { align-items: center; border: 1px solid var(--admin-border); color: var(--admin-muted); display: inline-flex; font-size: .7rem; font-weight: 900; gap: 8px; letter-spacing: .08em; padding: 9px 11px; text-transform: uppercase; }
+        .admin-dirty::before { background: var(--admin-success); border-radius: 50%; content: ""; height: 7px; width: 7px; }
+        .admin-dirty.is-dirty { border-color: var(--admin-primary); color: var(--admin-primary); }
+        .admin-dirty.is-dirty::before { background: #ffca6b; }
+        .admin-header-copy { color: var(--admin-muted); line-height: 1.65; margin: 0; max-width: 850px; }
+        .admin-header-copy a { color: var(--admin-primary); }
+        .admin-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 9px; margin: 22px 0; }
+        .admin-button { background: var(--admin-primary); border: 0; color: var(--admin-primary-ink); cursor: pointer; font: 900 .71rem/1 var(--body-font, Inter), Arial, sans-serif; letter-spacing: .1em; padding: 13px 16px; text-transform: uppercase; }
+        .admin-button:hover, .admin-button:focus-visible { background: #fff; box-shadow: 4px 4px 0 var(--admin-primary); outline: 0; }
+        .admin-button:disabled { cursor: not-allowed; opacity: .45; }
+        .admin-button-secondary { background: transparent; box-shadow: inset 0 0 0 1px var(--admin-border); color: var(--admin-text); }
+        .admin-button-danger { background: var(--admin-danger); color: #5c0004; }
+        .admin-status { background: var(--admin-panel); border-left: 5px solid var(--admin-primary); min-height: 22px; padding: 13px 16px; }
+        .admin-status-error { border-left-color: var(--admin-danger); color: var(--admin-danger); }
+        .admin-status-success { border-left-color: var(--admin-success); color: var(--admin-success); }
+        .admin-status ul { margin: 8px 0 0; padding-left: 20px; }
+        .admin-import { background: var(--admin-panel); margin: 18px 0 28px; padding: 18px; }
+        .admin-hidden { display: none !important; }
+        .admin-section-panel { background: var(--admin-panel); box-shadow: var(--admin-shadow); margin: 28px 0; padding: clamp(18px, 3vw, 28px); scroll-margin-top: 20px; }
+        .admin-section-panel > h2 { border-bottom: 4px solid var(--admin-primary); font-size: 1.35rem; letter-spacing: .12em; margin: 0 0 24px; padding-bottom: 12px; text-transform: uppercase; }
+        .admin-overview-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); margin-bottom: 22px; }
+        .admin-metric, .admin-overview-note { background: var(--admin-panel-high); padding: 17px; }
+        .admin-metric strong { display: block; font-size: 2rem; margin-top: 6px; }
+        .admin-overview-note { color: var(--admin-muted); line-height: 1.6; }
+        .admin-subsection { border-top: 1px solid var(--admin-border); margin-top: 24px; padding-top: 22px; }
+        .admin-subsection:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+        .admin-subsection-header { align-items: center; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; margin-bottom: 16px; }
+        .admin-subsection h3 { font-size: .86rem; letter-spacing: .1em; margin: 0; text-transform: uppercase; }
+        .admin-field-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+        .admin-field { display: flex; flex-direction: column; gap: 7px; }
+        .admin-field-wide { grid-column: 1 / -1; }
+        .admin-input, .admin-textarea, .admin-select { background: var(--admin-panel-high); border: 0; border-bottom: 3px solid transparent; color: var(--admin-text); font: 500 .94rem/1.45 var(--body-font, Inter), Arial, sans-serif; padding: 12px; width: 100%; }
+        .admin-textarea { min-height: 94px; resize: vertical; }
+        .admin-input:focus, .admin-textarea:focus, .admin-select:focus { border-bottom-color: var(--admin-primary); outline: 0; }
+        .admin-collection { display: grid; gap: 16px; }
+        .admin-item { background: var(--admin-panel-low); border-left: 5px solid #686bff; padding: 17px; }
+        .admin-item-header { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; margin-bottom: 16px; }
+        .admin-item-title { font-size: .76rem; font-weight: 900; letter-spacing: .1em; margin: 0; text-transform: uppercase; }
+        .admin-item-controls { display: flex; flex-wrap: wrap; gap: 6px; }
+        .admin-small-button { background: var(--admin-panel-high); border: 0; color: var(--admin-text); cursor: pointer; font: 900 .63rem/1 var(--body-font, Inter), Arial, sans-serif; letter-spacing: .06em; padding: 8px 9px; text-transform: uppercase; }
+        .admin-small-button:hover, .admin-small-button:focus-visible { background: var(--admin-primary); color: var(--admin-primary-ink); outline: 0; }
+        .admin-small-button:disabled { cursor: not-allowed; opacity: .38; }
+        .admin-empty { color: var(--admin-muted); font-style: italic; margin: 0; }
+        .admin-choice-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+        .admin-check-list { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+        .admin-check { align-items: center; background: var(--admin-panel-high); color: var(--admin-text); display: flex; gap: 9px; padding: 11px; }
+        .admin-check input { accent-color: var(--admin-primary); height: 16px; width: 16px; }
+        .admin-help { color: var(--admin-muted); font-size: .83rem; line-height: 1.55; margin: 0 0 15px; }
+        .admin-file { border: 1px dashed var(--admin-border); padding: 18px; }
+        .admin-notice { background: var(--admin-primary); color: var(--admin-primary-ink); display: block; font-size: .78rem; letter-spacing: .08em; padding: 11px 13px; text-transform: uppercase; }
+        .admin-file input { color: var(--admin-muted); max-width: 100%; }
+        .admin-file-info { background: var(--admin-panel-high); margin-top: 16px; padding: 14px; }
+        .admin-file-info strong, .admin-file-info span { display: block; }
+        .admin-file-info span { color: var(--admin-muted); font-size: .82rem; margin-top: 5px; }
+        .admin-file-preview { background: #fff; border: 0; display: block; height: min(620px, 65vh); margin-top: 14px; width: 100%; }
+        .admin-file-link { color: var(--admin-primary); display: inline-block; font-weight: 800; margin-top: 12px; }
+        .admin-auth-gate { background: var(--admin-panel); border-left: 5px solid var(--admin-primary); box-shadow: var(--admin-shadow); margin: 28px auto; max-width: 720px; padding: clamp(20px, 4vw, 34px); }
+        .admin-auth-gate h1 { font-size: clamp(1.7rem, 4vw, 2.7rem); line-height: 1; margin: 0 0 10px; text-transform: uppercase; }
+        .admin-auth-copy { color: var(--admin-muted); line-height: 1.6; margin: 0 0 20px; }
+        .admin-auth-form { display: grid; gap: 14px; margin-top: 20px; }
+        .admin-auth-form .admin-button { justify-self: start; }
+        .admin-auth-account { align-items: center; display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; margin-top: 16px; }
+        .admin-auth-account span { color: var(--admin-muted); font-size: .85rem; line-height: 1.5; }
+        .admin-auth-help { color: var(--admin-muted); font-size: .82rem; line-height: 1.6; margin: 16px 0 0; }
+        .admin-preview { background: #0b0b0f; margin-top: 30px; padding: 26px; }
+        .admin-preview-frame { background: var(--surface, #fff); border: 1px solid var(--admin-border); display: block; height: min(900px, 78vh); width: 100%; }
+        .admin-preview h2 { color: var(--admin-primary); font-size: 1.35rem; letter-spacing: .1em; margin-top: 0; text-transform: uppercase; }
+        .admin-preview h3 { font-size: clamp(1.8rem, 5vw, 4.6rem); line-height: .95; margin: 16px 0; text-transform: uppercase; }
+        .admin-preview h4 { color: var(--admin-primary); margin-bottom: 5px; text-transform: uppercase; }
+        .admin-preview p, .admin-preview li { color: var(--admin-muted); line-height: 1.6; }
+        .admin-preview-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        .admin-preview-card { background: var(--admin-panel); padding: 16px; }
+        .admin-preview-tag { background: #32324b; color: var(--admin-primary); display: inline-block; font-size: .68rem; font-weight: 900; margin: 4px 4px 0 0; padding: 5px 7px; text-transform: uppercase; }
+        .admin-footer-note { color: var(--admin-muted); font-size: .8rem; margin-top: 28px; }
+        @media (max-width: 850px) { .admin-app { display: block; } .admin-sidebar { height: auto; padding: 16px 12px 12px; position: static; } .admin-brand { margin-bottom: 16px; } .admin-nav { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px; } .admin-nav-button { min-width: max-content; } .admin-nav-title { display: none; } .admin-main { padding-top: 22px; } }
+        @media (max-width: 600px) { .admin-main { padding-left: 12px; padding-right: 12px; } .admin-actions .admin-button { flex: 1 1 125px; } }
+    </style>
+</head>
+<body class="admin-body">
+    <section id="auth-gate" class="admin-auth-gate" aria-labelledby="auth-heading">
+        <h1 id="auth-heading">Shared portfolio access</h1>
+        <p class="admin-auth-copy">Sign in with an allow-listed Supabase account to edit and publish the shared portfolio. Local browser storage is used only as an offline draft fallback.</p>
+        <div id="auth-status" class="admin-status" role="status" aria-live="polite">Checking Supabase setup…</div>
+        <form id="auth-form" class="admin-auth-form admin-hidden" novalidate>
+            <label class="admin-field"><span class="admin-label">Email</span><input id="auth-email" class="admin-input" type="email" autocomplete="username" required></label>
+            <label class="admin-field"><span class="admin-label">Password</span><input id="auth-password" class="admin-input" type="password" autocomplete="current-password" required></label>
+            <button id="auth-submit" class="admin-button" type="submit">Sign in</button>
+        </form>
+        <div id="auth-account" class="admin-auth-account admin-hidden">
+            <span>Signed in as <strong id="auth-user"></strong></span>
+            <button id="sign-out-button" class="admin-button admin-button-secondary" type="button">Sign out</button>
+        </div>
+        <button id="auth-retry" class="admin-button admin-button-secondary admin-hidden" type="button">Retry connection / access</button>
+        <p id="auth-help" class="admin-auth-help">The editor will appear after authentication and allow-list verification.</p>
+    </section>
+    <div id="protected-admin" class="admin-app admin-hidden">
+        <aside class="admin-sidebar" aria-label="Editor navigation">
+            <div class="admin-brand"><strong>Portfolio CMS</strong><span>Shared publisher</span></div>
+            <div class="admin-nav-title">Workspace</div>
+            <nav class="admin-nav" id="admin-nav">
+                <button class="admin-nav-button is-active" type="button" data-section-target="overview" data-nav-key="overview"><span class="admin-nav-index">00</span><span>Overview</span></button>
+                <button class="admin-nav-button" type="button" data-section-target="profile" data-nav-key="profile"><span class="admin-nav-index">01</span><span>Profile</span></button>
+                <button class="admin-nav-button" type="button" data-section-target="about" data-nav-key="about"><span class="admin-nav-index">02</span><span>About</span></button>
+                <button class="admin-nav-button" type="button" data-section-target="education" data-nav-key="education"><span class="admin-nav-index">03</span><span>Education</span></button>
+                <button class="admin-nav-button" type="button" data-section-target="skills" data-nav-key="skills"><span class="admin-nav-index">04</span><span>Skills</span></button>
+                <button class="admin-nav-button" type="button" data-section-target="experience" data-nav-key="experience"><span class="admin-nav-index">05</span><span>Experience</span></button>
+                <button class="admin-nav-button" type="button" data-section-target="projects" data-nav-key="projects"><span class="admin-nav-index">06</span><span>Projects</span></button>
+                <button class="admin-nav-button" type="button" data-section-target="certifications" data-nav-key="certifications"><span class="admin-nav-index">07</span><span>Certifications</span></button>
+                <button class="admin-nav-button" type="button" data-section-target="achievements" data-nav-key="awards"><span class="admin-nav-index">08</span><span>Achievements</span></button>
+                <button class="admin-nav-button" type="button" data-section-target="social" data-nav-key="contact"><span class="admin-nav-index">09</span><span>Social</span></button>
+                <button class="admin-nav-button" type="button" data-section-target="resume" data-nav-key="resume"><span class="admin-nav-index">10</span><span>Resume</span></button>
+                <button class="admin-nav-button" type="button" data-section-target="appearance" data-nav-key="appearance"><span class="admin-nav-index">11</span><span>Appearance</span></button>
+            </nav>
+        </aside>
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <div><div class="admin-kicker">Portfolio content control</div><h1>Admin Editor</h1></div>
+                <div id="dirty-indicator" class="admin-dirty">Loading shared content</div>
+            </header>
+            <p class="admin-header-copy">Edit the validated portfolio model in a focused workspace. Save publishes an authenticated shared row; a local draft is retained only when Supabase is unavailable. <a href="index.html">Open public portfolio →</a></p>
+            <div class="admin-actions" aria-label="Editor actions">
+                <button class="admin-button" id="save-button" type="button">Save changes</button>
+                <button class="admin-button admin-button-secondary" id="cancel-button" type="button">Cancel</button>
+                <button class="admin-button admin-button-secondary" id="reset-button" type="button">Reset draft to defaults</button>
+                <button class="admin-button admin-button-secondary admin-hidden" id="restore-draft-button" type="button">Restore offline draft</button>
+                <button class="admin-button admin-button-secondary" id="preview-button" type="button">Live preview</button>
+                <button class="admin-button admin-button-secondary" id="export-button" type="button">Export JSON</button>
+                <button class="admin-button admin-button-secondary" id="import-toggle" type="button">Import JSON</button>
+            </div>
+            <div id="status" class="admin-status" role="status" aria-live="polite">Loading editor…</div>
+            <section id="import-panel" class="admin-import admin-hidden" aria-labelledby="import-heading">
+                <div class="admin-label" id="import-heading">Paste exported JSON</div>
+                <textarea id="import-json" class="admin-textarea" rows="10" spellcheck="false" aria-label="Portfolio JSON to import"></textarea>
+                <div class="admin-actions"><button class="admin-button" id="import-button" type="button">Load JSON into editor</button></div>
+            </section>
+            <form id="editor-form" novalidate><div id="editor-root"></div></form>
+            <section id="preview-panel" class="admin-preview admin-hidden" aria-labelledby="preview-heading">
+                <div class="admin-subsection-header"><h2 id="preview-heading">Live content preview</h2><button class="admin-button admin-button-secondary" id="close-preview" type="button">Close preview</button></div>
+                <iframe id="public-preview-frame" class="admin-preview-frame" src="index.html?preview=1" data-preview-src="index.html?preview=1" title="Live public portfolio preview"></iframe>
+            </section>
+            <p class="admin-footer-note">Offline draft key: <span id="storage-key-label"></span>. Export JSON for a portable backup.</p>
+        </main>
+    </div>
+    <noscript><p class="admin-status admin-status-error">JavaScript is required for the authenticated editor.</p></noscript>
+    <script src="content.js"></script>
+    <script src="content-store.js"></script>
+    <script src="appearance.js"></script>
+    <script src="supabase-client.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
