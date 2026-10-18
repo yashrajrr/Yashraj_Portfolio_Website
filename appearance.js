@@ -8,7 +8,10 @@
     var themes = {
         midnight: { accent: "#93c5fd", surface: "#0b1220" },
         minimal: { accent: "#3347b0", surface: "#fbfaf7" },
-        accent: { accent: "#c0c1ff", surface: "#101028" }
+        accent: { accent: "#c0c1ff", surface: "#101028" },
+        forest: { accent: "#5eead4", surface: "#071a17" },
+        ember: { accent: "#fbbf24", surface: "#1c0b08" },
+        orchid: { accent: "#e9a8ff", surface: "#160d21" }
     };
     var fallback = {
         theme: "midnight", headingFont: "Public Sans", bodyFont: "Inter",

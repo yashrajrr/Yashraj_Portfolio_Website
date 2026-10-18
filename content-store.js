@@ -21,7 +21,7 @@
     };
 
     var APPEARANCE_OPTIONS = {
-        theme: ["midnight", "minimal", "accent"],
+        theme: ["midnight", "minimal", "accent", "forest", "ember", "orchid"],
         headingFont: ["Inter", "Manrope", "Plus Jakarta Sans", "DM Sans", "Space Grotesk", "IBM Plex Sans", "Source Sans 3", "Public Sans", "Lora"],
         bodyFont: ["Inter", "Manrope", "Plus Jakarta Sans", "DM Sans", "Space Grotesk", "IBM Plex Sans", "Source Sans 3", "Public Sans", "Lora"],
         radius: ["sharp", "soft", "rounded"],

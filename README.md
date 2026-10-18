@@ -88,17 +88,26 @@ Navigate to `http://localhost:8000`
 4. Use **Live preview** to inspect the actual public renderer with unsaved changes, or **Export JSON** to keep a portable backup.
 5. Use **Import JSON** to restore an exported content file in another browser.
 
-The Appearance panel provides exactly three themes, independent heading/body font selectors, accent colour, radius, motion, hero layout, and visibility controls. The Resume panel manages structured resume content separately from an uploaded PDF. Embedded PDF uploads are limited to 1 MB to stay within browser storage quotas; once published, the validated PDF data is available to public visitors through the shared content row. A committed PDF asset and published relative URL is recommended for larger files.
+The Appearance panel provides six colour themes, independent heading/body font selectors, accent colour, radius, motion, hero layout, and visibility controls. The Resume panel manages structured resume content separately from an uploaded PDF. Embedded PDF uploads are limited to 1 MB to stay within browser storage quotas; once published, the validated PDF data is available to public visitors through the shared content row. A committed PDF asset and published relative URL is recommended for larger files.
 
 The public page reads the published row from Supabase on load, so a saved change is shared with every visitor and device. If Supabase is unavailable, the committed seed content remains the safe public fallback. The editor requires a Supabase Auth session and a matching row in `public.portfolio_admins`; database Row Level Security is the final publishing boundary. When Supabase configuration or the network is unavailable, a validated draft can be kept in browser `localStorage` and retried later. Embedded PDFs remain limited to 1 MB; a committed asset (for example `asset/resume.pdf`) and published relative URL is recommended when a separate public file is preferred. The Web3Forms access key is deployment configuration, not an editable admin field.
 
 ### Supabase and Vercel setup
 
-1. Run `supabase/schema.sql` in the Supabase SQL editor.
-2. Enable email/password sign-in in Supabase Auth and create the administrator user.
-3. Add that Auth user's UUID to `public.portfolio_admins` with the example insert at the bottom of the schema file.
-4. Add these Vercel project environment variables and redeploy: `SUPABASE_URL` (the project URL) and `SUPABASE_ANON_KEY` (the public browser anon key). Do not expose a service-role key. `api/config.js` returns only these browser-safe values.
-5. Add the deployed site's `/admin` URL to Supabase Auth's allowed redirect URLs if email confirmation or password recovery is enabled.
+This repository is initialized for the Supabase CLI. From the project root, authenticate and link the hosted project, then apply the versioned schema migration:
+
+```powershell
+npx supabase login
+npx supabase link --project-ref <your-project-ref>
+npx supabase db push
+```
+
+The initial migration is `supabase/migrations/20261018160003_portfolio_schema.sql`. `supabase/schema.sql` remains available for manual SQL Editor setup, but the CLI migration is the preferred deployment path.
+
+1. Enable email/password sign-in in Supabase Auth and create the administrator user.
+2. Add that Auth user's UUID to `public.portfolio_admins` with the example insert at the bottom of the migration file.
+3. Add these Vercel project environment variables and redeploy: `SUPABASE_URL` (the project URL) and `SUPABASE_ANON_KEY` (the public browser anon key). Do not expose a service-role key. `api/config.js` returns only these browser-safe values.
+4. Add the deployed site's `/admin` URL to Supabase Auth's allowed redirect URLs if email confirmation or password recovery is enabled.
 
 To reset the current draft to the seed content, select **Reset draft to defaults** in the editor. This does not change the published Supabase row until the seed content is saved again.
 

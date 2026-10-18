@@ -4,7 +4,7 @@
 - **Project:** Personal Portfolio Website for Yashraj Radheshyam Rathor.
 - **Goal:** Create a brutalist, modern, and high-impact portfolio for a Data Engineer / ML practitioner.
 - **Tech Stack:** Static HTML, Vanilla JavaScript, generated Tailwind CSS, Supabase Auth/database, a Vercel config function, and a token-based appearance system.
-- **Theme/Aesthetic:** Brutalist/editorial identity with three themes (`midnight`, `minimal`, `accent`), centralized CSS tokens, curated typography, full-width horizontal cards, and raw edges.
+- **Theme/Aesthetic:** Brutalist/editorial identity with six themes (`midnight`, `minimal`, `accent`, `forest`, `ember`, `orchid`), centralized CSS tokens, curated typography, full-width horizontal cards, and raw edges.
 - **Local Dev Server:** Run `npm install`, `npm run build`, then `python -m http.server 8000 --directory dist` from the project root when testing. Do not assume a background server is still running.
 
 ## 2. Work Accomplished
@@ -18,7 +18,7 @@
    - Mitigated reverse tabnabbing by applying `rel="noopener noreferrer"` to all `target="_blank"` anchor tags (LinkedIn, GitHub).
 - **Admin Editor:** Added `admin.html` and `admin.js` for authenticated editing and shared publishing of all public content categories. `content.js` contains the versioned seed and `content-store.js` validates local offline drafts under `yashraj-portfolio-content:v1`.
 - **Public Rendering:** `index.html` is a safe structural shell. `main.js` renders the committed seed immediately, then replaces it with the validated public Supabase row when configured; it never exposes an unsaved local admin draft to public visitors.
-- **Appearance System:** `appearance.js`, `style.css`, and `tailwind.config.js` provide the three theme palettes, selected-font loading, radius/motion/hero switches, contrast-safe accent handling, and reduced-motion support.
+- **Appearance System:** `appearance.js`, `style.css`, and `tailwind.config.js` provide the six theme palettes, selected-font loading, radius/motion/hero switches, contrast-safe accent handling, and reduced-motion support.
 - **Admin Preview:** The dashboard sends validated draft content to `index.html?preview=1` with same-origin `postMessage`; preview drafts are not persisted.
 - **Resume Management:** The editor supports PDF selection, header validation, preview, download, removal, and a separate published URL field. Embedded PDFs are validated and published with the shared content row; a committed asset URL is recommended for larger files.
 - **Supabase/Vercel:** `supabase/schema.sql` defines the public content row, administrator allow-list, trigger, grants, and RLS. `supabase-client.js` uses only a browser-safe anon/publishable key. `api/config.js` exposes `SUPABASE_URL` and `SUPABASE_ANON_KEY` from Vercel environment variables.

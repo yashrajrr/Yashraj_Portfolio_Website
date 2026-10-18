@@ -34,7 +34,7 @@
     --motion-ease: cubic-bezier(.22, 1, .36, 1);
 }
 
-/* Three complete palettes. The selectors intentionally support the current
+/* Complete palettes. The selectors intentionally support the current
    body dataset as well as the root dataset written by PortfolioAppearance. */
 html[data-theme="midnight"], html:not([data-theme]) body[data-theme="midnight"] {
     --surface: #080d18;
@@ -106,6 +106,78 @@ html[data-theme="accent"], html:not([data-theme]) body[data-theme="accent"] {
     --tertiary-rgb: 255 107 97;
     --shadow: 0 18px 36px rgb(0 0 0 / 0.24);
     --shadow-offset: 7px 7px 0 rgb(255 180 171 / 0.14);
+}
+
+html[data-theme="forest"], html:not([data-theme]) body[data-theme="forest"] {
+    --surface: #071a17;
+    --panel: #0d2822;
+    --raised: #163932;
+    --ink: #ebfff7;
+    --muted: #a6cfc2;
+    --accent: #5eead4;
+    --accent-ink: #000000;
+    --border: #3e7667;
+    --surface-rgb: 7 26 23;
+    --panel-rgb: 13 40 34;
+    --raised-rgb: 22 57 50;
+    --ink-rgb: 235 255 247;
+    --muted-rgb: 166 207 194;
+    --accent-rgb: 94 234 212;
+    --accent-ink-rgb: 0 0 0;
+    --border-rgb: 62 118 103;
+    --tertiary: #bef264;
+    --tertiary-container: #a3e635;
+    --tertiary-rgb: 190 242 100;
+    --shadow: 0 18px 36px rgb(0 0 0 / 0.24);
+    --shadow-offset: 7px 7px 0 rgb(94 234 212 / 0.13);
+}
+
+html[data-theme="ember"], html:not([data-theme]) body[data-theme="ember"] {
+    --surface: #1c0b08;
+    --panel: #30130c;
+    --raised: #482018;
+    --ink: #fff3ed;
+    --muted: #e4b8a8;
+    --accent: #fbbf24;
+    --accent-ink: #000000;
+    --border: #835044;
+    --surface-rgb: 28 11 8;
+    --panel-rgb: 48 19 12;
+    --raised-rgb: 72 32 24;
+    --ink-rgb: 255 243 237;
+    --muted-rgb: 228 184 168;
+    --accent-rgb: 251 191 36;
+    --accent-ink-rgb: 0 0 0;
+    --border-rgb: 131 80 68;
+    --tertiary: #fda4af;
+    --tertiary-container: #fb7185;
+    --tertiary-rgb: 253 164 175;
+    --shadow: 0 18px 36px rgb(0 0 0 / 0.26);
+    --shadow-offset: 7px 7px 0 rgb(251 191 36 / 0.14);
+}
+
+html[data-theme="orchid"], html:not([data-theme]) body[data-theme="orchid"] {
+    --surface: #160d21;
+    --panel: #251336;
+    --raised: #371c50;
+    --ink: #fff2ff;
+    --muted: #d9b8dc;
+    --accent: #e9a8ff;
+    --accent-ink: #000000;
+    --border: #79558c;
+    --surface-rgb: 22 13 33;
+    --panel-rgb: 37 19 54;
+    --raised-rgb: 55 28 80;
+    --ink-rgb: 255 242 255;
+    --muted-rgb: 217 184 220;
+    --accent-rgb: 233 168 255;
+    --accent-ink-rgb: 0 0 0;
+    --border-rgb: 121 85 140;
+    --tertiary: #93c5fd;
+    --tertiary-container: #60a5fa;
+    --tertiary-rgb: 147 197 253;
+    --shadow: 0 18px 36px rgb(0 0 0 / 0.27);
+    --shadow-offset: 7px 7px 0 rgb(233 168 255 / 0.14);
 }
 
 html {
