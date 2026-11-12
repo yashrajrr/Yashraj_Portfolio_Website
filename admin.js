@@ -17,6 +17,7 @@
     var resumeBlobUrl = "";
     var uploadToken = 0;
     var previewTimer = null;
+    var pendingEditorFocusKey = "";
     var authStatus;
     var authForm;
     var authEmail;
@@ -35,6 +36,9 @@
     var editorReady = false;
     var authRetry;
     var restoreDraftButton;
+    var navSearch;
+    var navEmpty;
+    var previewButton;
     var offlineDraft = null;
     var pendingPublish = false;
     var savedPendingPublish = false;
@@ -106,7 +110,8 @@
         next.appearance = appearance;
         next.resume = Object.assign(defaultResume(), next.resume && typeof next.resume === "object" ? next.resume : {});
         if (next.resume.dataUrl) next.resume.downloadUrl = "";
-        (next.projects || []).forEach(function (project) { ["githubUrl", "problem", "implementation", "results"].forEach(function (key) { if (project[key] === undefined) project[key] = ""; }); });
+        (next.projects || []).forEach(function (project) { ["githubUrl", "problem", "implementation", "results"].forEach(function (key) { if (project[key] === undefined) project[key] = ""; }); if (!Array.isArray(project.links)) project.links = []; });
+        (next.certifications || []).forEach(function (item) { if (!Array.isArray(item.links)) item.links = []; });
         (next.experience || []).forEach(function (entry) { if (!Array.isArray(entry.accomplishments)) entry.accomplishments = []; });
         return next;
     }
@@ -121,41 +126,164 @@
     }
     function updateDirtyIndicator() { dirtyIndicator.classList.toggle("is-dirty", dirty || pendingPublish); dirtyIndicator.textContent = dirty ? "Unsaved changes" : pendingPublish ? "Draft · not published" : "Published content"; }
     function markClean() { dirty = false; updateDirtyIndicator(); }
-    function renderField(parent, value, field, onChange) {
+    function syncThemeCards() {
+        document.querySelectorAll("[data-theme-preset]").forEach(function (card) {
+            var active = card.getAttribute("data-theme-preset") === state.appearance.theme;
+            card.setAttribute("aria-pressed", active ? "true" : "false");
+            card.classList.toggle("is-selected", active);
+        });
+    }
+    function updateNavigation() {
+        if (!root) return;
+        var panels = Array.prototype.slice.call(root.querySelectorAll(".admin-section-panel")).filter(function (panel) { return !panel.hidden; });
+        var marker = Math.max(140, (window.innerHeight || 700) * 0.28), activeKey = panels.length ? panels[0].dataset.sectionKey : "";
+        panels.forEach(function (panel) { if (panel.getBoundingClientRect().top <= marker) activeKey = panel.dataset.sectionKey; });
+        document.querySelectorAll(".admin-nav-button").forEach(function (button) {
+            var active = button.getAttribute("data-section-target") === activeKey;
+            button.classList.toggle("is-active", active);
+            if (active) button.setAttribute("aria-current", "location"); else button.removeAttribute("aria-current");
+        });
+    }
+    function filterSections() {
+        if (!navSearch || !root) return;
+        var query = navSearch.value.trim().toLowerCase(), found = false;
+        root.querySelectorAll(".admin-section-panel").forEach(function (panel) {
+            var visible = !query || panel.textContent.toLowerCase().indexOf(query) !== -1;
+            panel.hidden = !visible; found = found || visible;
+            var navButton = document.querySelector('.admin-nav-button[data-section-target="' + panel.dataset.sectionKey + '"]');
+            if (navButton) navButton.hidden = !visible;
+        });
+        if (navEmpty) navEmpty.classList.toggle("admin-hidden", !query || found);
+        updateNavigation();
+    }
+    function renderField(parent, value, field, onChange, focusKey) {
         var wrapper = make("label", "admin-field" + (field.wide ? " admin-field-wide" : "")); wrapper.appendChild(make("span", "admin-label", field.label));
         var input = make(field.type === "textarea" || field.type === "list" ? "textarea" : "input", field.type === "textarea" || field.type === "list" ? "admin-textarea" : "admin-input");
         if (field.type !== "textarea" && field.type !== "list") input.type = field.type === "url" ? "url" : "text";
         if (field.type === "list") { input.rows = Math.min(8, Math.max(3, Array.isArray(value) ? value.length + 1 : 3)); input.value = Array.isArray(value) ? value.join("\n") : ""; input.placeholder = "One item per line"; }
         else { input.value = value == null ? "" : value; input.maxLength = fieldLimit(field); if (field.type === "textarea") input.rows = 4; }
+        if (focusKey) input.dataset.editorFocus = focusKey;
         input.addEventListener("input", function () { onChange(field.type === "list" ? input.value.split(/\r?\n/).map(function (item) { return item.trim(); }).filter(Boolean) : input.value); markDirty(); });
         wrapper.appendChild(input); parent.appendChild(wrapper);
     }
     function emptyItem(definition) { var item = {}; definition.fields.forEach(function (field) { item[field.key] = field.type === "list" ? [] : ""; }); return item; }
     function itemLabel(item, index, definition) { var preferred = item.title || item.role || item.degree || item.category || item.label || item.value || item.eyebrow; return preferred ? String(preferred) : definition.title + " " + (index + 1); }
     function subHeader(title, actionLabel, action) { var header = make("div", "admin-subsection-header"); header.appendChild(make("h3", "", title)); if (action) { var button = make("button", "admin-button", actionLabel); button.type = "button"; button.addEventListener("click", action); header.appendChild(button); } return header; }
+    function renderCustomLinks(parent, item, collectionKey, itemIndex) {
+        if (!Array.isArray(item.links)) item.links = [];
+        var section = make("div", "admin-item-links"), heading = make("div", "admin-subsection-header");
+        heading.appendChild(make("h4", "admin-item-title", "Additional links"));
+        var add = make("button", "admin-button admin-button-secondary", "Add link"); add.type = "button"; add.addEventListener("click", function () {
+            if (item.links.length >= 20) return;
+            item.links.push({ label: "", url: "" });
+            drawRows(); markDirty();
+            var nextInput = section.querySelector('[data-editor-focus="link:' + collectionKey + ':' + itemIndex + ':' + (item.links.length - 1) + ':label"]');
+            if (nextInput) nextInput.focus({ preventScroll: true });
+        });
+        heading.appendChild(add); section.appendChild(heading);
+        var rows = make("div", "admin-link-rows"); section.appendChild(rows);
+        function drawRows() {
+            clear(rows);
+            add.disabled = item.links.length >= 20;
+            if (!item.links.length) { rows.appendChild(make("p", "admin-empty", "Add a label and URL for documentation, demos, repositories, or certificates.")); return; }
+            item.links.forEach(function (link, linkIndex) {
+                var row = make("div", "admin-link-row");
+                renderField(row, link.label, { key: "label", label: "Link label" }, function (next) { link.label = next; }, "link:" + collectionKey + ":" + itemIndex + ":" + linkIndex + ":label");
+                renderField(row, link.url, { key: "url", label: "Link URL", type: "url" }, function (next) { link.url = next; }, "link:" + collectionKey + ":" + itemIndex + ":" + linkIndex + ":url");
+                var remove = make("button", "admin-button admin-button-secondary admin-button-danger", "Remove"); remove.type = "button"; remove.addEventListener("click", function () { item.links.splice(linkIndex, 1); drawRows(); markDirty(); }); row.appendChild(remove);
+                rows.appendChild(row);
+            });
+        }
+        drawRows(); parent.appendChild(section);
+    }
     function renderCollection(parent, definition) {
-        var section = make("div", "admin-subsection"); section.appendChild(subHeader(definition.title, "Add " + definition.title.replace(/ entries| groups| details| stats| links/gi, "").replace(/s$/, ""), function () { var items = getPath(state, definition.path); if (!Array.isArray(items)) { setPath(state, definition.path, []); items = getPath(state, definition.path); } items.push(emptyItem(definition)); renderEditor(); markDirty(); setStatus(definition.title + " item added. Fill it in and save when ready."); }));
+        var section = make("div", "admin-subsection"); section.appendChild(subHeader(definition.title, "Add " + definition.title.replace(/ entries| groups| details| stats| links/gi, "").replace(/s$/, ""), function () { var items = getPath(state, definition.path); if (!Array.isArray(items)) { setPath(state, definition.path, []); items = getPath(state, definition.path); } items.push(emptyItem(definition)); pendingEditorFocusKey = definition.path + ":" + (items.length - 1) + ":" + definition.fields[0].key; renderEditor(); markDirty(); setStatus(definition.title + " item added. Fill it in and save when ready."); }));
         var list = make("div", "admin-collection"), items = getPath(state, definition.path);
         if (!Array.isArray(items) || !items.length) list.appendChild(make("p", "admin-empty", "No items yet. Add the first one."));
         (items || []).forEach(function (item, index) {
             var card = make("article", "admin-item"), header = make("div", "admin-item-header"); header.appendChild(make("h4", "admin-item-title", itemLabel(item, index, definition))); var controls = make("div", "admin-item-controls");
             [{ label: "Up", action: function () { var temp = items[index - 1]; items[index - 1] = items[index]; items[index] = temp; renderEditor(); markDirty(); } }, { label: "Down", action: function () { var temp = items[index + 1]; items[index + 1] = items[index]; items[index] = temp; renderEditor(); markDirty(); } }, { label: "Delete", danger: true, action: function () { if (!window.confirm("Delete this " + definition.title.toLowerCase().replace(/ entries| groups| details| stats| links/gi, "") + "?")) return; items.splice(index, 1); renderEditor(); markDirty(); setStatus(definition.title + " item deleted."); } }].forEach(function (control) { var button = make("button", "admin-small-button" + (control.danger ? " admin-button-danger" : ""), control.label); button.type = "button"; button.disabled = (control.label === "Up" && index === 0) || (control.label === "Down" && index === items.length - 1); button.addEventListener("click", control.action); controls.appendChild(button); });
-            header.appendChild(controls); card.appendChild(header); var grid = make("div", "admin-field-grid"); definition.fields.forEach(function (field) { renderField(grid, item[field.key], field, function (next) { item[field.key] = next; }); }); card.appendChild(grid); list.appendChild(card);
+            header.appendChild(controls); card.appendChild(header); var grid = make("div", "admin-field-grid"); definition.fields.forEach(function (field) { renderField(grid, item[field.key], field, function (next) { item[field.key] = next; }, definition.path + ":" + index + ":" + field.key); }); card.appendChild(grid);
+            if (definition.path === "projects" || definition.path === "certifications") renderCustomLinks(card, item, definition.path, index);
+            list.appendChild(card);
         }); section.appendChild(list); parent.appendChild(section);
     }
-    function renderScalar(parent, key) { var definition = scalarDefinitions[key], section = make("div", "admin-subsection"); section.appendChild(subHeader(definition.title)); var grid = make("div", "admin-field-grid"), object = getPath(state, definition.path); definition.fields.forEach(function (field) { renderField(grid, object[field.key], field, function (next) { object[field.key] = next; }); }); section.appendChild(grid); parent.appendChild(section); }
+    function renderScalar(parent, key) { var definition = scalarDefinitions[key], section = make("div", "admin-subsection"); section.appendChild(subHeader(definition.title)); var grid = make("div", "admin-field-grid"), object = getPath(state, definition.path); definition.fields.forEach(function (field) { renderField(grid, object[field.key], field, function (next) { object[field.key] = next; }, definition.path + ":" + field.key); }); section.appendChild(grid); parent.appendChild(section); }
     function renderPanel(key, title) { var panel = make("section", "admin-section-panel"); panel.id = "admin-section-" + key; panel.dataset.sectionKey = key; panel.appendChild(make("h2", "", title)); return panel; }
     function renderOverview() {
         var panel = renderPanel("overview", "Overview"), grid = make("div", "admin-overview-grid"), metrics = [["Projects", state.projects.length], ["Skills", state.skills.length], ["Experience", state.experience.length], ["Education", state.education.length], ["Resume", state.resume.dataUrl ? "Ready" : "Not set"]];
         metrics.forEach(function (metric) { var card = make("div", "admin-metric"); card.appendChild(make("span", "admin-label", metric[0])); card.appendChild(make("strong", "", String(metric[1]))); grid.appendChild(card); }); panel.appendChild(grid); panel.appendChild(make("p", "admin-overview-note", "Use the navigation to edit each portfolio area. The preview reflects current in-memory edits, including changes that have not been saved yet.")); return panel;
     }
     function renderAppearance() {
-        var panel = renderPanel("appearance", "Appearance"); panel.appendChild(make("p", "admin-help", "Draft changes apply to the live preview immediately and are persisted only when you select Save changes."));
-        var choices = make("div", "admin-choice-grid"); [{ key: "theme", label: "Colour theme", options: ["midnight", "minimal", "accent", "forest", "ember", "orchid"] }, { key: "headingFont", label: "Heading font", options: appearanceFonts("headingFont") }, { key: "bodyFont", label: "Body font", options: appearanceFonts("bodyFont") }, { key: "radius", label: "Corner radius", options: ["sharp", "soft", "rounded"] }, { key: "animation", label: "Animation", options: ["reduced", "subtle", "full"] }, { key: "heroLayout", label: "Hero layout", options: ["split", "stacked"] }].forEach(function (definition) { var label = make("label", "admin-field"); label.appendChild(make("span", "admin-label", definition.label)); var select = make("select", "admin-select"); definition.options.forEach(function (option) { var optionElement = make("option", "", option); optionElement.value = option; select.appendChild(optionElement); }); select.value = state.appearance[definition.key]; select.addEventListener("change", function () { var previousTheme = state.appearance.theme; state.appearance[definition.key] = select.value; if (definition.key === "theme" && state.appearance.accentColor === THEME_DEFAULTS[previousTheme]) state.appearance.accentColor = THEME_DEFAULTS[select.value]; markDirty(); }); label.appendChild(select); choices.appendChild(label); });
-        var colorLabel = make("label", "admin-field"); colorLabel.appendChild(make("span", "admin-label", "Accent color")); var color = make("input", "admin-input"); color.type = "color"; color.value = state.appearance.accentColor; color.addEventListener("input", function () { state.appearance.accentColor = color.value; markDirty(); }); colorLabel.appendChild(color); choices.appendChild(colorLabel); panel.appendChild(choices);
-        [["sectionVisibility", "Section visibility"], ["navigationVisibility", "Navigation visibility"]].forEach(function (group) { var area = make("div", "admin-subsection"); area.appendChild(make("h3", "", group[1])); area.appendChild(make("p", "admin-help", group[0] === "sectionVisibility" ? "Choose which public content sections are rendered." : "Choose which items are shown in the public navigation.")); var checks = make("div", "admin-check-list"); SECTION_KEYS.forEach(function (key) { var label = make("label", "admin-check"), checkbox = make("input"); checkbox.type = "checkbox"; checkbox.checked = state.appearance[group[0]][key] !== false; checkbox.addEventListener("change", function () { state.appearance[group[0]][key] = checkbox.checked; updateNavigation(); markDirty(); }); label.appendChild(checkbox); label.appendChild(make("span", "", key.charAt(0).toUpperCase() + key.slice(1))); checks.appendChild(label); }); area.appendChild(checks); panel.appendChild(area); });
-        var themePreview = make("div", "admin-theme-preview"); themePreview.appendChild(make("h3", "", "Theme preview")); var themeCards = make("div", "admin-theme-grid"); [{ key: "midnight", title: "Midnight Professional", swatch: "#111827", accent: THEME_DEFAULTS.midnight }, { key: "minimal", title: "Minimal Light", swatch: "#faf8f3", accent: THEME_DEFAULTS.minimal }, { key: "accent", title: "Modern Accent", swatch: "#101827", accent: THEME_DEFAULTS.accent }, { key: "forest", title: "Verdant Forest", swatch: "#071a17", accent: THEME_DEFAULTS.forest }, { key: "ember", title: "Amber Ember", swatch: "#1c0b08", accent: THEME_DEFAULTS.ember }, { key: "orchid", title: "Electric Orchid", swatch: "#160d21", accent: THEME_DEFAULTS.orchid }].forEach(function (theme) { var card = make("button", "admin-theme-card"); card.type = "button"; card.style.backgroundColor = theme.swatch; card.style.color = theme.accent; card.appendChild(make("strong", "", theme.title)); card.appendChild(make("span", "", "Aa  /  " + theme.accent)); card.addEventListener("click", function () { state.appearance.theme = theme.key; state.appearance.accentColor = theme.accent; renderEditor(); markDirty(); goToSection("appearance"); }); themeCards.appendChild(card); }); themePreview.appendChild(themeCards); panel.appendChild(themePreview);
-        var resetActions = make("div", "admin-actions"); var resetAppearance = make("button", "admin-button admin-button-secondary", "Reset appearance"); resetAppearance.id = "reset-appearance"; resetAppearance.type = "button"; resetAppearance.addEventListener("click", function () { var defaults = defaultAppearance(); state.appearance = Object.assign({}, state.appearance, defaults); renderEditor(); markDirty(); goToSection("appearance"); }); var resetTypography = make("button", "admin-button admin-button-secondary", "Reset typography"); resetTypography.id = "reset-typography"; resetTypography.type = "button"; resetTypography.addEventListener("click", function () { state.appearance.headingFont = "Public Sans"; state.appearance.bodyFont = "Inter"; renderEditor(); markDirty(); goToSection("appearance"); }); resetActions.appendChild(resetAppearance); resetActions.appendChild(resetTypography); panel.appendChild(resetActions);
+        var panel = renderPanel("appearance", "Appearance");
+        panel.appendChild(make("p", "admin-help", "Draft changes apply to the live preview immediately and are persisted only when you select Save changes."));
+        var choices = make("div", "admin-choice-grid");
+        [
+            { key: "theme", label: "Colour theme", options: ["midnight", "minimal", "accent", "forest", "ember", "orchid"] },
+            { key: "headingFont", label: "Heading font", options: appearanceFonts("headingFont") },
+            { key: "bodyFont", label: "Body font", options: appearanceFonts("bodyFont") },
+            { key: "radius", label: "Corner radius", options: ["sharp", "soft", "rounded"] },
+            { key: "animation", label: "Animation", options: ["reduced", "subtle", "full"] },
+            { key: "heroLayout", label: "Hero layout", options: ["split", "stacked"] }
+        ].forEach(function (definition) {
+            var label = make("label", "admin-field");
+            label.appendChild(make("span", "admin-label", definition.label));
+            var select = make("select", "admin-select");
+            select.dataset.editorFocus = "appearance:" + definition.key;
+            definition.options.forEach(function (option) { var element = make("option", "", option); element.value = option; select.appendChild(element); });
+            select.value = state.appearance[definition.key];
+            select.addEventListener("change", function () {
+                var previousTheme = state.appearance.theme;
+                state.appearance[definition.key] = select.value;
+                if (definition.key === "theme" && state.appearance.accentColor === THEME_DEFAULTS[previousTheme]) state.appearance.accentColor = THEME_DEFAULTS[select.value];
+                syncThemeCards(); markDirty();
+            });
+            label.appendChild(select); choices.appendChild(label);
+        });
+        var colorLabel = make("label", "admin-field"); colorLabel.appendChild(make("span", "admin-label", "Accent color"));
+        var color = make("input", "admin-input"); color.type = "color"; color.value = state.appearance.accentColor; color.dataset.editorFocus = "appearance:accentColor";
+        color.addEventListener("input", function () { state.appearance.accentColor = color.value; markDirty(); });
+        colorLabel.appendChild(color); choices.appendChild(colorLabel); panel.appendChild(choices);
+        [["sectionVisibility", "Section visibility"], ["navigationVisibility", "Navigation visibility"]].forEach(function (group) {
+            var area = make("div", "admin-subsection"); area.appendChild(make("h3", "", group[1]));
+            area.appendChild(make("p", "admin-help", group[0] === "sectionVisibility" ? "Choose which public content sections are rendered." : "Choose which items are shown in the public navigation."));
+            var checks = make("div", "admin-check-list");
+            SECTION_KEYS.forEach(function (key) {
+                var label = make("label", "admin-check"), checkbox = make("input"); checkbox.type = "checkbox";
+                checkbox.checked = state.appearance[group[0]][key] !== false; checkbox.dataset.editorFocus = "appearance:" + group[0] + ":" + key;
+                checkbox.addEventListener("change", function () { state.appearance[group[0]][key] = checkbox.checked; updateNavigation(); markDirty(); });
+                label.appendChild(checkbox); label.appendChild(make("span", "", key.charAt(0).toUpperCase() + key.slice(1))); checks.appendChild(label);
+            });
+            area.appendChild(checks); panel.appendChild(area);
+        });
+        var themePreview = make("div", "admin-theme-preview"); themePreview.appendChild(make("h3", "", "Theme preview"));
+        var themeCards = make("div", "admin-theme-grid");
+        [
+            { key: "midnight", title: "Midnight Professional", swatch: "#111827", accent: THEME_DEFAULTS.midnight },
+            { key: "minimal", title: "Minimal Light", swatch: "#faf8f3", accent: THEME_DEFAULTS.minimal },
+            { key: "accent", title: "Modern Accent", swatch: "#101827", accent: THEME_DEFAULTS.accent },
+            { key: "forest", title: "Verdant Forest", swatch: "#071a17", accent: THEME_DEFAULTS.forest },
+            { key: "ember", title: "Amber Ember", swatch: "#1c0b08", accent: THEME_DEFAULTS.ember },
+            { key: "orchid", title: "Electric Orchid", swatch: "#160d21", accent: THEME_DEFAULTS.orchid }
+        ].forEach(function (theme) {
+            var card = make("button", "admin-theme-card"); card.type = "button"; card.dataset.themePreset = theme.key; card.dataset.editorFocus = "theme-preset:" + theme.key;
+            card.setAttribute("aria-pressed", state.appearance.theme === theme.key ? "true" : "false"); card.classList.toggle("is-selected", state.appearance.theme === theme.key); card.style.backgroundColor = theme.swatch; card.style.color = theme.accent;
+            card.appendChild(make("strong", "", theme.title)); card.appendChild(make("span", "", "Aa  /  " + theme.accent));
+            card.addEventListener("click", function () {
+                state.appearance.theme = theme.key; state.appearance.accentColor = theme.accent;
+                var themeSelect = panel.querySelector('[data-editor-focus="appearance:theme"]'); if (themeSelect) themeSelect.value = theme.key;
+                var accentInput = panel.querySelector('[data-editor-focus="appearance:accentColor"]'); if (accentInput) accentInput.value = theme.accent;
+                syncThemeCards(); markDirty();
+            });
+            themeCards.appendChild(card);
+        });
+        themePreview.appendChild(themeCards); panel.appendChild(themePreview);
+        var resetActions = make("div", "admin-actions");
+        var resetAppearance = make("button", "admin-button admin-button-secondary", "Reset appearance"); resetAppearance.id = "reset-appearance"; resetAppearance.type = "button"; resetAppearance.dataset.editorFocus = "reset-appearance";
+        resetAppearance.addEventListener("click", function () { var defaults = defaultAppearance(); state.appearance = Object.assign({}, state.appearance, defaults); renderEditor(); markDirty(); });
+        var resetTypography = make("button", "admin-button admin-button-secondary", "Reset typography"); resetTypography.id = "reset-typography"; resetTypography.type = "button"; resetTypography.dataset.editorFocus = "reset-typography";
+        resetTypography.addEventListener("click", function () { state.appearance.headingFont = "Public Sans"; state.appearance.bodyFont = "Inter"; renderEditor(); markDirty(); });
+        resetActions.appendChild(resetAppearance); resetActions.appendChild(resetTypography); panel.appendChild(resetActions);
         return panel;
     }
     function revokeResumePreview() { if (resumeBlobUrl) { URL.revokeObjectURL(resumeBlobUrl); resumeBlobUrl = ""; } }
@@ -181,21 +309,37 @@
         revokeResumePreview();
         var panel = renderPanel("resume", "Resume"), fileArea = make("div", "admin-file"); fileArea.appendChild(make("strong", "admin-notice", "PDF / shared metadata")); fileArea.appendChild(make("p", "admin-help", "Structured resume metadata and a validated embedded PDF are included when the shared content is published. Embedded PDFs are limited to " + formatBytes(maxResumeBytes()) + "; use a committed relative URL or HTTPS URL when a separate public asset is preferred.")); var input = make("input"); input.type = "file"; input.accept = ".pdf,application/pdf"; input.setAttribute("aria-label", "Choose a PDF resume"); input.addEventListener("change", function () { var file = input.files && input.files[0]; if (!file) return; uploadToken += 1; acceptResumeFile(file, uploadToken, input); }); fileArea.appendChild(input); panel.appendChild(fileArea);
         var resume = state.resume; if (resume.dataUrl) { var info = make("div", "admin-file-info"); info.appendChild(make("strong", "", resume.fileName)); info.appendChild(make("span", "", formatBytes(resume.fileSize) + " · " + (resume.fileType || "application/pdf"))); var frame = make("iframe", "admin-file-preview"); frame.sandbox = "allow-scripts"; frame.src = resumeBlobUrl = URL.createObjectURL(pdfBlob(resume.dataUrl)); frame.title = "Resume PDF preview"; info.appendChild(frame); var link = make("a", "admin-file-link", resume.downloadLabel || "Download resume"); link.href = resumeBlobUrl; link.download = resume.fileName || "resume.pdf"; link.target = "_blank"; link.rel = "noopener"; info.appendChild(link); var remove = make("button", "admin-button admin-button-danger", "Remove uploaded PDF"); remove.type = "button"; remove.addEventListener("click", function () { if (!window.confirm("Remove the uploaded PDF from this draft?")) return; uploadToken += 1; state.resume = Object.assign(defaultResume(), { downloadLabel: resume.downloadLabel || "Download resume" }); renderEditor(); markDirty(); setStatus("Uploaded PDF removed. A published download URL can now be entered."); }); info.appendChild(remove); panel.appendChild(info); } else panel.appendChild(make("p", "admin-empty", "No uploaded PDF. Structured resume content remains independent of this file."));
-        var fields = make("div", "admin-subsection"); fields.appendChild(make("h3", "", "Structured resume download settings")); fields.appendChild(make("p", "admin-help", "Use a committed relative path such as asset/resume.pdf or a safe HTTPS URL for a published resume. Embedded PDFs intentionally keep downloadUrl empty to avoid duplicating base64 data.")); var fieldGrid = make("div", "admin-field-grid"); renderField(fieldGrid, resume.downloadLabel, { key: "downloadLabel", label: "Download label" }, function (next) { state.resume.downloadLabel = next; }); if (!resume.dataUrl) renderField(fieldGrid, resume.downloadUrl, { key: "downloadUrl", label: "Published resume URL", type: "url" }, function (next) { state.resume.downloadUrl = next; }); else fieldGrid.appendChild(make("p", "admin-help", "Published resume URL is enabled after removing the uploaded PDF.")); fields.appendChild(fieldGrid); panel.appendChild(fields); return panel;
+        var fields = make("div", "admin-subsection"); fields.appendChild(make("h3", "", "Structured resume download settings")); fields.appendChild(make("p", "admin-help", "Use a committed relative path such as asset/resume.pdf or a safe HTTPS URL for a published resume. Embedded PDFs intentionally keep downloadUrl empty to avoid duplicating base64 data.")); var fieldGrid = make("div", "admin-field-grid"); renderField(fieldGrid, resume.downloadLabel, { key: "downloadLabel", label: "Download label" }, function (next) { state.resume.downloadLabel = next; }, "resume:downloadLabel"); if (!resume.dataUrl) renderField(fieldGrid, resume.downloadUrl, { key: "downloadUrl", label: "Published resume URL", type: "url" }, function (next) { state.resume.downloadUrl = next; }, "resume:downloadUrl"); else fieldGrid.appendChild(make("p", "admin-help", "Published resume URL is enabled after removing the uploaded PDF.")); fields.appendChild(fieldGrid); panel.appendChild(fields); return panel;
     }
     function renderEditor() {
+        var scrollX = window.scrollX || 0, scrollY = window.scrollY || 0, active = document.activeElement;
+        var focusKey = pendingEditorFocusKey || (active && active.getAttribute ? active.getAttribute("data-editor-focus") : "");
+        pendingEditorFocusKey = "";
+        var selection = null;
+        if (focusKey && typeof active.selectionStart === "number") selection = { start: active.selectionStart, end: active.selectionEnd, direction: active.selectionDirection };
         clear(root); root.appendChild(renderOverview()); var profile = renderPanel("profile", "Profile"); renderScalar(profile, "site"); renderScalar(profile, "hero"); renderCollection(profile, collections.personalDetails); root.appendChild(profile);
         var about = renderPanel("about", "About"); renderScalar(about, "about"); renderCollection(about, collections.stats); root.appendChild(about);
         ["education", "skills", "experience", "projects", "certifications", "achievements"].forEach(function (key) { var panel = renderPanel(key, collections[key].title); renderCollection(panel, collections[key]); root.appendChild(panel); });
-        var social = renderPanel("social", "Social"); renderScalar(social, "contact"); renderScalar(social, "footer"); renderCollection(social, collections.footerLinks); root.appendChild(social); root.appendChild(renderResume()); root.appendChild(renderAppearance()); updateNavigation();
+        var social = renderPanel("social", "Social"); renderScalar(social, "contact"); renderScalar(social, "footer"); renderCollection(social, collections.footerLinks); root.appendChild(social); root.appendChild(renderResume()); root.appendChild(renderAppearance());
+        filterSections(); syncThemeCards();
+        if (focusKey || scrollY) window.requestAnimationFrame(function () {
+            var priorBehavior = document.documentElement.style.scrollBehavior;
+            document.documentElement.style.scrollBehavior = "auto";
+            window.scrollTo(scrollX, scrollY);
+            document.documentElement.style.scrollBehavior = priorBehavior;
+            if (!focusKey) return;
+            var next = Array.prototype.find.call(root.querySelectorAll("[data-editor-focus]"), function (element) { return element.getAttribute("data-editor-focus") === focusKey; });
+            if (!next) return;
+            next.focus({ preventScroll: true });
+            if (selection && typeof next.setSelectionRange === "function") { try { next.setSelectionRange(selection.start, selection.end, selection.direction); } catch (ignored) { /* Some input types do not support text selection. */ } }
+        });
     }
     function formatBytes(bytes) { if (!bytes) return "0 bytes"; if (bytes < 1024) return bytes + " bytes"; if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB"; return (bytes / (1024 * 1024)).toFixed(2) + " MB"; }
     function appearanceFonts(key) { var options = ContentStore.schema && ContentStore.schema.appearanceOptions && ContentStore.schema.appearanceOptions[key]; return options && options.length ? options.slice() : FONT_OPTIONS.slice(); }
     function applyAppearance() { if (window.PortfolioAppearance && typeof window.PortfolioAppearance.apply === "function") window.PortfolioAppearance.apply(state.appearance); }
-    function updateNavigation() { /* Admin navigation is always available; public visibility is independent. */ }
     function sendPreview() { if (!authorized || !editorReady || !state) return; var result = validation(state); if (!result.valid) return; var frame = document.getElementById("public-preview-frame"); if (!frame || !frame.contentWindow || frame.getAttribute("src") === "about:blank") return; frame.contentWindow.postMessage({ type: "portfolio:preview", content: result.value }, location.origin); }
     function schedulePreview() { if (previewTimer) window.clearTimeout(previewTimer); previewTimer = window.setTimeout(function () { previewTimer = null; sendPreview(); }, 200); }
-    function goToSection(key) { var target = document.getElementById("admin-section-" + key); if (!target) return; document.querySelectorAll(".admin-nav-button").forEach(function (button) { button.classList.toggle("is-active", button.getAttribute("data-section-target") === key); }); target.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    function goToSection(key) { var target = document.getElementById("admin-section-" + key); if (!target || target.hidden) return; target.scrollIntoView({ behavior: "smooth", block: "start" }); updateNavigation(); }
     function setAuthStatus(message, errors, success) {
         clear(authStatus); authStatus.className = "admin-status" + (errors && errors.length ? " admin-status-error" : success ? " admin-status-success" : "");
         authStatus.appendChild(make("span", "", message));
@@ -233,7 +377,15 @@
     function setPreviewFrame(active) {
         var frame = document.getElementById("public-preview-frame");
         if (!frame) return;
-        frame.setAttribute("src", active ? (frame.getAttribute("data-preview-src") || "index.html?preview=1") : "about:blank");
+        var target = active ? (frame.getAttribute("data-preview-src") || "index.html?preview=1") : "about:blank";
+        if (frame.getAttribute("src") !== target) frame.setAttribute("src", target);
+    }
+    function togglePreview(open) {
+        var active = typeof open === "boolean" ? open : previewPanel.classList.contains("admin-hidden");
+        previewPanel.classList.toggle("admin-hidden", !active);
+        protectedAdmin.classList.toggle("admin-preview-open", active);
+        previewButton.setAttribute("aria-expanded", active ? "true" : "false");
+        if (active) { setPreviewFrame(true); window.requestAnimationFrame(sendPreview); }
     }
     function installEditorState(next, isPending) {
         uploadToken += 1; state = normalizeState(next); savedState = clone(state); savedPendingPublish = !!isPending; pendingPublish = !!isPending; dirty = false; editorReady = true; renderEditor(); applyAppearance(); updateDirtyIndicator(); updateRestoreDraftButton(); schedulePreview();
@@ -245,7 +397,7 @@
         return normalizeState(result.value);
     }
     function loadRemoteEditor(attempt) {
-        setPreviewFrame(true);
+        setPreviewFrame(false);
         var offline = loadInitialState();
         offlineDraft = readOfflineDraft();
         return fetch("/api/content", { credentials: "same-origin", cache: "no-store" }).then(function (response) { if (!response.ok) throw new Error("Published content could not be loaded."); return response.json(); }).then(function (record) {
@@ -285,7 +437,9 @@
         setStatus("Publishing shared content…");
         fetch("/api/content", { method: "PUT", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: result.value, schemaVersion: ContentStore.schemaVersion }) }).then(function (response) { return response.json().then(function (body) { if (!response.ok) throw new Error(body.error || "Vercel content storage is unavailable."); return body; }); }).then(function () {
             if (saveAttempt !== authAttempt || !authenticatedUser || !authorized) return;
-            state = normalizeState(result.value); savedState = clone(state); savedPendingPublish = false; pendingPublish = false; markClean(); clearOfflineDraft();
+            state = normalizeState(result.value); savedState = clone(state); savedPendingPublish = false; pendingPublish = false; markClean();
+            try { window.localStorage.setItem(ContentStore.publishedCacheKey, JSON.stringify({ content: result.value })); } catch (ignored) { /* The server publish remains successful when local cache storage is full. */ }
+            clearOfflineDraft();
             setStatus("Changes published to the shared portfolio.", null, true);
             authHelp.textContent = "The latest validated content is published to Vercel Blob for the portfolio to load.";
         }).catch(function (error) {
@@ -307,7 +461,7 @@
     function restoreDraft() { if (!offlineDraft || !editorReady) return; uploadToken += 1; state = clone(offlineDraft); dirty = true; pendingPublish = true; renderEditor(); updateDirtyIndicator(); updateRestoreDraftButton(); setStatus("Offline draft restored. Select Save changes to publish it.", null, true); }
     function exportJson() { var result = validation(state); if (!result.valid) { setStatus("The current model cannot be exported.", result.errors); return; } try { var json = ContentStore.export(result.value); importText.value = json; var blob = new Blob([json], { type: "application/json" }); var url = URL.createObjectURL(blob); var link = document.createElement("a"); link.href = url; link.download = "portfolio-content-v" + ContentStore.schemaVersion + ".json"; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); setStatus("JSON exported. Keep the downloaded file as a backup.", null, true); } catch (error) { setStatus(error.message || "The current content could not be exported.", error.details || []); } }
     function importJson() { try { uploadToken += 1; state = normalizeState(ContentStore.import(importText.value)); renderEditor(); markDirty(); importPanel.classList.add("admin-hidden"); setStatus("JSON loaded into the editor. Save changes to publish it.", null, true); } catch (error) { setStatus(error.message || "JSON could not be loaded.", error.details || ["Check that the JSON is a valid portfolio export."]); } }
-    function clearEditorAccess() { authAttempt += 1; authenticatedUser = null; authorized = false; editorReady = false; pendingPublish = false; savedPendingPublish = false; offlineDraft = null; restoreDraftButton.classList.add("admin-hidden"); previewPanel.classList.add("admin-hidden"); setPreviewFrame(false); showProtectedEditor(false); }
+    function clearEditorAccess() { authAttempt += 1; authenticatedUser = null; authorized = false; editorReady = false; pendingPublish = false; savedPendingPublish = false; offlineDraft = null; restoreDraftButton.classList.add("admin-hidden"); togglePreview(false); setPreviewFrame(false); showProtectedEditor(false); }
     function handleSession(session) {
         var attempt = ++authAttempt;
         if (!session || !session.user) { clearEditorAccess(); setAuthMode("login"); setAuthRetryVisible(false); setAuthStatus("Sign in to open the portfolio editor."); return Promise.resolve(); }
@@ -333,12 +487,15 @@
         fetch("/api/auth/session", { credentials: "same-origin", cache: "no-store" }).then(function (response) { if (!response.ok) throw new Error("Vercel authentication is not configured."); return response.json(); }).then(handleSession).catch(function (error) { setAuthMode("locked"); setAuthStatus("Vercel admin access is not configured.", [error.message || "Check the Vercel environment variables."]); authHelp.textContent = "Set ADMIN_EMAIL, ADMIN_PASSWORD, and SESSION_SECRET in Vercel, then redeploy."; setAuthRetryVisible(true); });
     }
     function init() {
-        root = document.getElementById("editor-root"); status = document.getElementById("status"); previewPanel = document.getElementById("preview-panel"); importPanel = document.getElementById("import-panel"); importText = document.getElementById("import-json"); dirtyIndicator = document.getElementById("dirty-indicator");
+        root = document.getElementById("editor-root"); status = document.getElementById("status"); previewPanel = document.getElementById("preview-panel"); importPanel = document.getElementById("import-panel"); importText = document.getElementById("import-json"); dirtyIndicator = document.getElementById("dirty-indicator"); navSearch = document.getElementById("admin-nav-search"); navEmpty = document.getElementById("admin-nav-empty"); previewButton = document.getElementById("preview-button");
         authStatus = document.getElementById("auth-status"); authForm = document.getElementById("auth-form"); authEmail = document.getElementById("auth-email"); authPassword = document.getElementById("auth-password"); authSubmit = document.getElementById("auth-submit"); authAccount = document.getElementById("auth-account"); authUser = document.getElementById("auth-user"); authHelp = document.getElementById("auth-help"); signOutButton = document.getElementById("sign-out-button"); protectedAdmin = document.getElementById("protected-admin"); authRetry = document.getElementById("auth-retry"); restoreDraftButton = document.getElementById("restore-draft-button");
         var frame = document.getElementById("public-preview-frame");
         if (frame) { frame.addEventListener("load", function () { sendPreview(); }); window.addEventListener("message", function (event) { if (event.origin !== location.origin || event.source !== frame.contentWindow || !event.data || event.data.type !== "portfolio:preview-ready") return; sendPreview(); }); }
         document.getElementById("storage-key-label").textContent = ContentStore.storageKey;
-        document.getElementById("editor-form").addEventListener("submit", function (event) { event.preventDefault(); save(); }); document.getElementById("save-button").addEventListener("click", save); document.getElementById("cancel-button").addEventListener("click", cancel); document.getElementById("reset-button").addEventListener("click", reset); document.getElementById("preview-button").addEventListener("click", function () { previewPanel.classList.remove("admin-hidden"); previewPanel.scrollIntoView({ behavior: "smooth", block: "start" }); sendPreview(); }); document.getElementById("close-preview").addEventListener("click", function () { previewPanel.classList.add("admin-hidden"); }); document.getElementById("export-button").addEventListener("click", exportJson); document.getElementById("import-toggle").addEventListener("click", function () { importPanel.classList.toggle("admin-hidden"); if (!importPanel.classList.contains("admin-hidden")) importText.focus(); }); document.getElementById("import-button").addEventListener("click", importJson); document.querySelectorAll("[data-section-target]").forEach(function (button) { button.addEventListener("click", function () { goToSection(button.getAttribute("data-section-target")); }); });
+        document.getElementById("editor-form").addEventListener("submit", function (event) { event.preventDefault(); save(); }); document.getElementById("save-button").addEventListener("click", save); document.getElementById("cancel-button").addEventListener("click", cancel); document.getElementById("reset-button").addEventListener("click", reset); previewButton.addEventListener("click", function () { togglePreview(); }); document.getElementById("close-preview").addEventListener("click", function () { togglePreview(false); }); document.getElementById("export-button").addEventListener("click", exportJson); document.getElementById("import-toggle").addEventListener("click", function () { importPanel.classList.toggle("admin-hidden"); if (!importPanel.classList.contains("admin-hidden")) importText.focus(); }); document.getElementById("import-button").addEventListener("click", importJson); document.querySelectorAll("[data-section-target]").forEach(function (button) { button.addEventListener("click", function () { goToSection(button.getAttribute("data-section-target")); }); });
+        navSearch.addEventListener("input", filterSections);
+        window.addEventListener("scroll", updateNavigation, { passive: true });
+        window.addEventListener("keydown", function (event) { if (event.key === "Escape" && !previewPanel.classList.contains("admin-hidden")) togglePreview(false); });
         authForm.addEventListener("submit", signIn); signOutButton.addEventListener("click", signOut); authRetry.addEventListener("click", retryAuth); restoreDraftButton.addEventListener("click", restoreDraft); setAuthMode("login"); setAuthRetryVisible(false); showProtectedEditor(false); initializeAuth(false);
         window.addEventListener("beforeunload", function (event) { revokeResumePreview(); if (!dirty) return; event.preventDefault(); event.returnValue = ""; });
     }

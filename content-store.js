@@ -3,6 +3,7 @@
 
     var SCHEMA_VERSION = 1;
     var STORAGE_KEY = "yashraj-portfolio-content:v" + SCHEMA_VERSION;
+    var PUBLISHED_CACHE_KEY = "yashraj-portfolio-published:v" + SCHEMA_VERSION;
     var seed = root.PORTFOLIO_CONTENT;
 
     if (!seed && typeof require === "function") {
@@ -209,7 +210,9 @@
         if (Array.isArray(migrated.projects)) migrated.projects.forEach(function (project) {
             if (!isObject(project)) return;
             ["problem", "implementation", "results", "githubUrl"].forEach(function (key) { if (!has(project, key)) project[key] = ""; });
+            if (!has(project, "links")) project.links = [];
         });
+        if (Array.isArray(migrated.certifications)) migrated.certifications.forEach(function (item) { if (isObject(item) && !has(item, "links")) item.links = []; });
         if (Array.isArray(migrated.experience)) migrated.experience.forEach(function (entry) { if (isObject(entry) && !has(entry, "accomplishments")) entry.accomplishments = []; });
         return migrated;
     }
@@ -263,11 +266,21 @@
         function text(item, key, path, max) { checkString(item[key], path + "." + key, max || LIMITS.medium, errors); }
         function url(item, key, path) { checkUrl(item[key], path + "." + key, errors); }
         function list(item, key, path, maxItems) { checkList(item[key], path + "." + key, maxItems || 40, LIMITS.listItem, errors); }
+        function validateLinks(value, path) {
+            if (!Array.isArray(value)) { addError(errors, path, "must be a list"); return; }
+            if (value.length > 20) addError(errors, path, "must contain no more than 20 links");
+            value.forEach(function (link, index) {
+                var linkPath = path + "[" + index + "]";
+                if (!checkObject(link, linkPath, errors)) return;
+                checkString(link.label, linkPath + ".label", LIMITS.short, errors);
+                checkUrl(link.url, linkPath + ".url", errors);
+            });
+        }
 
         eachCollection("projects", 50, function (item, path) {
             if (!collectionObject(item, path)) return;
             ["title", "category", "date"].forEach(function (key) { text(item, key, path); });
-            text(item, "description", path, LIMITS.long); text(item, "problem", path, LIMITS.long); text(item, "implementation", path, LIMITS.long); text(item, "results", path, LIMITS.long); list(item, "tags", path, 40); url(item, "image", path); url(item, "url", path); url(item, "githubUrl", path);
+            text(item, "description", path, LIMITS.long); text(item, "problem", path, LIMITS.long); text(item, "implementation", path, LIMITS.long); text(item, "results", path, LIMITS.long); list(item, "tags", path, 40); url(item, "image", path); url(item, "url", path); url(item, "githubUrl", path); validateLinks(item.links, path + ".links");
         });
         eachCollection("skills", 50, function (item, path) {
             if (!collectionObject(item, path)) return;
@@ -284,7 +297,7 @@
         eachCollection("certifications", 50, function (item, path) {
             if (!collectionObject(item, path)) return;
             ["issuer", "title", "organization", "imageAlt"].forEach(function (key) { text(item, key, path); });
-            url(item, "image", path); url(item, "url", path);
+            url(item, "image", path); url(item, "url", path); validateLinks(item.links, path + ".links");
         });
         eachCollection("achievements", 50, function (item, path) {
             if (!collectionObject(item, path)) return;
@@ -378,6 +391,7 @@
         schemaVersion: SCHEMA_VERSION,
         schema: clone(SCHEMA),
         storageKey: STORAGE_KEY,
+        publishedCacheKey: PUBLISHED_CACHE_KEY,
         limits: clone(LIMITS),
         defaults: defaults,
         load: load,

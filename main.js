@@ -268,6 +268,12 @@
                 setExternalLink(githubLink, "GitHub →", project.githubUrl);
                 links.appendChild(githubLink);
             }
+            (project.links || []).forEach(function (extraLink) {
+                if (!extraLink || !extraLink.url) return;
+                var link = make("a", "project-link project-link--extra inline-flex text-primary font-black uppercase tracking-widest text-xs hover:text-white");
+                setExternalLink(link, (extraLink.label || "Project link") + " →", extraLink.url);
+                links.appendChild(link);
+            });
             if (links.childNodes.length) body.appendChild(links);
             card.appendChild(accent); card.appendChild(body); list.appendChild(card);
         });
@@ -329,6 +335,12 @@
             card.appendChild(media);
             var body = make("div", "p-6 md:p-8"); body.appendChild(make("span", "text-[10px] font-black uppercase tracking-widest text-primary mb-2 block flex items-center gap-2", "✓ " + certificate.issuer)); body.appendChild(make("h4", "text-xl font-black uppercase mb-2 text-white leading-tight", certificate.title)); body.appendChild(make("p", "text-sm font-bold text-on-surface-variant", certificate.organization));
             if (certificate.url) { var link = make("a", "inline-block mt-4 text-primary text-xs font-black uppercase tracking-widest", "View certificate →"); setExternalLink(link, "View certificate →", certificate.url); body.appendChild(link); }
+            (certificate.links || []).forEach(function (extraLink) {
+                if (!extraLink || !extraLink.url) return;
+                var link = make("a", "inline-block mt-4 mr-4 text-primary text-xs font-black uppercase tracking-widest");
+                setExternalLink(link, (extraLink.label || "Certification link") + " →", extraLink.url);
+                body.appendChild(link);
+            });
             card.appendChild(body); list.appendChild(card);
         });
     }
@@ -680,10 +692,24 @@
     function loadPublishedPublicContent() {
         if (new URLSearchParams(window.location.search).get("preview") === "1") return;
         fetch("/api/content", { cache: "no-store" }).then(function (response) { if (!response.ok) return null; return response.json(); }).then(function (record) {
-            if (record && record.content) render(record.content);
+            if (!record || !record.content) return;
+            var validated = ContentStore.validate(record.content);
+            if (!validated.valid) return;
+            try { localStorage.setItem(ContentStore.publishedCacheKey, JSON.stringify({ content: validated.value })); } catch (ignored) { /* Rendering the fetched content still works without the fast-load cache. */ }
+            render(validated.value);
         }).catch(function () {
             // The committed seed remains the safe public fallback if Vercel Blob is unavailable.
         });
+    }
+
+    function loadCachedPublishedContent() {
+        try {
+            var raw = localStorage.getItem(ContentStore.publishedCacheKey);
+            if (!raw) return null;
+            var record = JSON.parse(raw);
+            var validated = ContentStore.validate(record && record.content);
+            return validated.valid ? validated.value : null;
+        } catch (ignored) { return null; }
     }
 
     function setupContactForm() {
@@ -701,15 +727,19 @@
     }
 
     function init() {
-        render(); setupContactForm(); loadPublishedPublicContent();
-        if (new URLSearchParams(window.location.search).get("preview") === "1") {
+        var previewMode = new URLSearchParams(window.location.search).get("preview") === "1";
+        render(previewMode ? undefined : (loadCachedPublishedContent() || undefined)); setupContactForm(); loadPublishedPublicContent();
+        if (previewMode) {
             window.addEventListener("message", function (event) {
                 if (event.origin !== window.location.origin || event.source !== window.parent || !event.data || event.data.type !== "portfolio:preview") return;
                 if (render(event.data.content)) event.source.postMessage({ type: "portfolio:preview-applied" }, event.origin);
             });
             if (window.parent !== window) window.parent.postMessage({ type: "portfolio:preview-ready" }, window.location.origin);
         }
-        window.addEventListener("storage", function (event) { if (event.key === ContentStore.storageKey) render(); });
+        window.addEventListener("storage", function (event) {
+            if (event.key !== ContentStore.publishedCacheKey || !event.newValue) return;
+            try { var record = JSON.parse(event.newValue); if (record && record.content) render(record.content); } catch (ignored) { /* Ignore malformed cross-tab storage updates. */ }
+        });
     }
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();

@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Authenticated shared portfolio content editor">
     <title>Portfolio Admin Editor | Yashraj Rathor</title>
+    <script src="appearance.js"></script>
+    <script>
+        try {
+            var cachedAdminPortfolio = JSON.parse(localStorage.getItem("yashraj-portfolio-published:v1") || "null");
+            if (cachedAdminPortfolio && cachedAdminPortfolio.content) window.PortfolioAppearance.apply(cachedAdminPortfolio.content.appearance);
+        } catch (ignored) { /* Admin uses its built-in theme until a published appearance is available. */ }
+    </script>
     <link rel="stylesheet" href="style.css">
     <style>
         :root {
@@ -34,6 +41,10 @@
         .admin-brand span, .admin-kicker, .admin-label, .admin-nav-label { color: var(--admin-muted); font-size: .67rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
         .admin-brand span { margin-top: 7px; }
         .admin-nav-title { color: var(--admin-muted); font-size: .66rem; font-weight: 900; letter-spacing: .14em; margin: 0 11px 8px; text-transform: uppercase; }
+        .admin-nav-search-wrap { display: block; margin: 0 6px 12px; }
+        .admin-nav-search { background: var(--admin-panel-high); border: 1px solid var(--admin-border); color: var(--admin-text); font: 600 .78rem/1.3 var(--body-font, Inter), Arial, sans-serif; padding: 11px 12px; width: 100%; }
+        .admin-nav-search:focus { border-color: var(--admin-primary); outline: 2px solid color-mix(in srgb, var(--admin-primary) 35%, transparent); }
+        .admin-nav-empty { color: var(--admin-muted); font-size: .78rem; line-height: 1.5; padding: 0 10px; }
         .admin-nav { display: grid; gap: 3px; }
         .admin-nav-button { align-items: center; background: transparent; border: 0; color: var(--admin-muted); cursor: pointer; display: flex; font: 800 .78rem/1.2 var(--body-font, Inter), Arial, sans-serif; gap: 10px; padding: 11px 12px; text-align: left; width: 100%; }
         .admin-nav-button:hover, .admin-nav-button:focus-visible, .admin-nav-button.is-active { background: var(--admin-panel-high); color: var(--admin-text); outline: 0; }
@@ -78,6 +89,9 @@
         .admin-input:focus, .admin-textarea:focus, .admin-select:focus { border-bottom-color: var(--admin-primary); outline: 0; }
         .admin-collection { display: grid; gap: 16px; }
         .admin-item { background: var(--admin-panel-low); border-left: 5px solid #686bff; padding: 17px; }
+        .admin-item-links { border-top: 1px solid var(--admin-border); margin-top: 18px; padding-top: 16px; }
+        .admin-link-row { align-items: end; background: var(--admin-panel); display: grid; gap: 10px; grid-template-columns: minmax(120px, .75fr) minmax(180px, 1.5fr) auto; margin-top: 10px; padding: 12px; }
+        .admin-link-row .admin-button { padding: 11px 12px; }
         .admin-item-header { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; margin-bottom: 16px; }
         .admin-item-title { font-size: .76rem; font-weight: 900; letter-spacing: .1em; margin: 0; text-transform: uppercase; }
         .admin-item-controls { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -106,8 +120,11 @@
         .admin-auth-account { align-items: center; display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; margin-top: 16px; }
         .admin-auth-account span { color: var(--admin-muted); font-size: .85rem; line-height: 1.5; }
         .admin-auth-help { color: var(--admin-muted); font-size: .82rem; line-height: 1.6; margin: 16px 0 0; }
-        .admin-preview { background: #0b0b0f; margin-top: 30px; padding: 26px; }
-        .admin-preview-frame { background: var(--surface, #fff); border: 1px solid var(--admin-border); display: block; height: min(900px, 78vh); width: 100%; }
+        .admin-preview { background: var(--admin-bg); border-left: 1px solid var(--admin-border); box-shadow: -18px 0 45px rgba(0, 0, 0, .28); display: flex; flex-direction: column; gap: 12px; height: 100dvh; margin: 0; padding: 16px; position: fixed; right: 0; top: 0; width: min(42vw, 680px); z-index: 100; }
+        .admin-preview-frame { background: var(--surface, #fff); border: 1px solid var(--admin-border); display: block; flex: 1; min-height: 0; width: 100%; }
+        .admin-preview-toolbar { align-items: center; display: flex; gap: 12px; justify-content: space-between; }
+        .admin-preview-toolbar p { color: var(--admin-muted); font-size: .76rem; margin: 0; }
+        .admin-preview-open .admin-main { padding-right: calc(min(42vw, 680px) + 34px); }
         .admin-preview h2 { color: var(--admin-primary); font-size: 1.35rem; letter-spacing: .1em; margin-top: 0; text-transform: uppercase; }
         .admin-preview h3 { font-size: clamp(1.8rem, 5vw, 4.6rem); line-height: .95; margin: 16px 0; text-transform: uppercase; }
         .admin-preview h4 { color: var(--admin-primary); margin-bottom: 5px; text-transform: uppercase; }
@@ -116,8 +133,9 @@
         .admin-preview-card { background: var(--admin-panel); padding: 16px; }
         .admin-preview-tag { background: #32324b; color: var(--admin-primary); display: inline-block; font-size: .68rem; font-weight: 900; margin: 4px 4px 0 0; padding: 5px 7px; text-transform: uppercase; }
         .admin-footer-note { color: var(--admin-muted); font-size: .8rem; margin-top: 28px; }
-        @media (max-width: 850px) { .admin-app { display: block; } .admin-sidebar { height: auto; padding: 16px 12px 12px; position: static; } .admin-brand { margin-bottom: 16px; } .admin-nav { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px; } .admin-nav-button { min-width: max-content; } .admin-nav-title { display: none; } .admin-main { padding-top: 22px; } }
-        @media (max-width: 600px) { .admin-main { padding-left: 12px; padding-right: 12px; } .admin-actions .admin-button { flex: 1 1 125px; } }
+        @media (max-width: 1000px) { .admin-preview { width: min(100vw, 560px); } .admin-preview-open .admin-main { padding-right: clamp(16px, 4vw, 52px); } }
+        @media (max-width: 850px) { .admin-app { display: block; } .admin-sidebar { height: auto; padding: 16px 12px 12px; position: static; } .admin-brand { margin-bottom: 16px; } .admin-nav { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px; } .admin-nav-button { min-width: max-content; } .admin-nav-title { display: none; } .admin-nav-search-wrap { margin-left: 0; min-width: 190px; } .admin-nav-empty { min-width: 160px; } .admin-main { padding-top: 22px; } .admin-preview { height: 72dvh; top: auto; bottom: 0; width: 100vw; } }
+        @media (max-width: 600px) { .admin-main { padding-left: 12px; padding-right: 12px; } .admin-actions .admin-button { flex: 1 1 125px; } .admin-link-row { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body class="admin-body">
@@ -141,6 +159,7 @@
         <aside class="admin-sidebar" aria-label="Editor navigation">
             <div class="admin-brand"><strong>Portfolio CMS</strong><span>Shared publisher</span></div>
             <div class="admin-nav-title">Workspace</div>
+            <label class="admin-nav-search-wrap"><span class="admin-hidden">Search editor sections</span><input id="admin-nav-search" class="admin-nav-search" type="search" placeholder="Find a section or field…" autocomplete="off"></label>
             <nav class="admin-nav" id="admin-nav">
                 <button class="admin-nav-button is-active" type="button" data-section-target="overview" data-nav-key="overview"><span class="admin-nav-index">00</span><span>Overview</span></button>
                 <button class="admin-nav-button" type="button" data-section-target="profile" data-nav-key="profile"><span class="admin-nav-index">01</span><span>Profile</span></button>
@@ -155,6 +174,7 @@
                 <button class="admin-nav-button" type="button" data-section-target="resume" data-nav-key="resume"><span class="admin-nav-index">10</span><span>Resume</span></button>
                 <button class="admin-nav-button" type="button" data-section-target="appearance" data-nav-key="appearance"><span class="admin-nav-index">11</span><span>Appearance</span></button>
             </nav>
+            <p id="admin-nav-empty" class="admin-nav-empty admin-hidden">No matching sections. Try another search.</p>
         </aside>
         <main class="admin-main">
             <header class="admin-topbar">
@@ -167,7 +187,7 @@
                 <button class="admin-button admin-button-secondary" id="cancel-button" type="button">Cancel</button>
                 <button class="admin-button admin-button-secondary" id="reset-button" type="button">Reset draft to defaults</button>
                 <button class="admin-button admin-button-secondary admin-hidden" id="restore-draft-button" type="button">Restore offline draft</button>
-                <button class="admin-button admin-button-secondary" id="preview-button" type="button">Live preview</button>
+                <button class="admin-button admin-button-secondary" id="preview-button" type="button" aria-expanded="false">Instant preview</button>
                 <button class="admin-button admin-button-secondary" id="export-button" type="button">Export JSON</button>
                 <button class="admin-button admin-button-secondary" id="import-toggle" type="button">Import JSON</button>
             </div>
@@ -179,7 +199,7 @@
             </section>
             <form id="editor-form" novalidate><div id="editor-root"></div></form>
             <section id="preview-panel" class="admin-preview admin-hidden" aria-labelledby="preview-heading">
-                <div class="admin-subsection-header"><h2 id="preview-heading">Live content preview</h2><button class="admin-button admin-button-secondary" id="close-preview" type="button">Close preview</button></div>
+                <div class="admin-preview-toolbar"><div><h2 id="preview-heading">Instant preview</h2><p>Updates as you edit. Changes are drafts until saved.</p></div><button class="admin-button admin-button-secondary" id="close-preview" type="button">Close</button></div>
                 <iframe id="public-preview-frame" class="admin-preview-frame" src="index.html?preview=1" data-preview-src="index.html?preview=1" title="Live public portfolio preview"></iframe>
             </section>
             <p class="admin-footer-note">Offline draft key: <span id="storage-key-label"></span>. Export JSON for a portable backup.</p>
@@ -188,7 +208,6 @@
     <noscript><p class="admin-status admin-status-error">JavaScript is required for the authenticated editor.</p></noscript>
     <script src="content.js"></script>
     <script src="content-store.js"></script>
-    <script src="appearance.js"></script>
     <script src="admin.js"></script>
 </body>
 </html>
