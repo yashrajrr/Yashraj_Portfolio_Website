@@ -123,8 +123,8 @@
 <body class="admin-body">
     <section id="auth-gate" class="admin-auth-gate" aria-labelledby="auth-heading">
         <h1 id="auth-heading">Shared portfolio access</h1>
-        <p class="admin-auth-copy">Sign in with an allow-listed Supabase account to edit and publish the shared portfolio. Local browser storage is used only as an offline draft fallback.</p>
-        <div id="auth-status" class="admin-status" role="status" aria-live="polite">Checking Supabase setup…</div>
+        <p class="admin-auth-copy">Sign in with the administrator credentials configured for this Vercel project to edit and publish the portfolio.</p>
+        <div id="auth-status" class="admin-status" role="status" aria-live="polite">Checking Vercel admin session…</div>
         <form id="auth-form" class="admin-auth-form admin-hidden" novalidate>
             <label class="admin-field"><span class="admin-label">Email</span><input id="auth-email" class="admin-input" type="email" autocomplete="username" required></label>
             <label class="admin-field"><span class="admin-label">Password</span><input id="auth-password" class="admin-input" type="password" autocomplete="current-password" required></label>
@@ -135,7 +135,7 @@
             <button id="sign-out-button" class="admin-button admin-button-secondary" type="button">Sign out</button>
         </div>
         <button id="auth-retry" class="admin-button admin-button-secondary admin-hidden" type="button">Retry connection / access</button>
-        <p id="auth-help" class="admin-auth-help">The editor will appear after authentication and allow-list verification.</p>
+        <p id="auth-help" class="admin-auth-help">The editor will appear after administrator authentication.</p>
     </section>
     <div id="protected-admin" class="admin-app admin-hidden">
         <aside class="admin-sidebar" aria-label="Editor navigation">
@@ -161,7 +161,7 @@
                 <div><div class="admin-kicker">Portfolio content control</div><h1>Admin Editor</h1></div>
                 <div id="dirty-indicator" class="admin-dirty">Loading shared content</div>
             </header>
-            <p class="admin-header-copy">Edit the validated portfolio model in a focused workspace. Save publishes an authenticated shared row; a local draft is retained only when Supabase is unavailable. <a href="index.html">Open public portfolio →</a></p>
+            <p class="admin-header-copy">Edit the validated portfolio model in a focused workspace. Save publishes content to Vercel Blob; a local draft is retained if publishing is unavailable. <a href="index.html">Open public portfolio →</a></p>
             <div class="admin-actions" aria-label="Editor actions">
                 <button class="admin-button" id="save-button" type="button">Save changes</button>
                 <button class="admin-button admin-button-secondary" id="cancel-button" type="button">Cancel</button>
@@ -189,7 +189,6 @@
     <script src="content.js"></script>
     <script src="content-store.js"></script>
     <script src="appearance.js"></script>
-    <script src="supabase-client.js"></script>
     <script src="admin.js"></script>
 </body>
 </html>

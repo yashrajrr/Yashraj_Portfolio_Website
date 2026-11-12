@@ -662,7 +662,7 @@
         } else {
             // Public visitors should never see an unsaved admin draft from
             // this browser. Start from the committed seed and replace it only
-            // with the authenticated publishing service's public row.
+            // with the published Vercel content record.
             content = ContentStore.defaults();
         }
         applyAppearance();
@@ -679,16 +679,10 @@
 
     function loadPublishedPublicContent() {
         if (new URLSearchParams(window.location.search).get("preview") === "1") return;
-        if (!window.PortfolioSupabase || typeof window.PortfolioSupabase.ready !== "function") return;
-
-        window.PortfolioSupabase.ready().then(function (state) {
-            if (!state || !state.available) return null;
-            return window.PortfolioSupabase.loadPublishedContent();
-        }).then(function (record) {
+        fetch("/api/content", { cache: "no-store" }).then(function (response) { if (!response.ok) return null; return response.json(); }).then(function (record) {
             if (record && record.content) render(record.content);
         }).catch(function () {
-            // The committed seed remains the safe public fallback when the
-            // optional shared content service is unavailable.
+            // The committed seed remains the safe public fallback if Vercel Blob is unavailable.
         });
     }
 

@@ -14,8 +14,7 @@ const files = [
     "admin.js",
     "appearance.js",
     "content.js",
-    "content-store.js",
-    "supabase-client.js"
+    "content-store.js"
 ];
 
 files.forEach((file) => cpSync(resolve(root, file), resolve(dist, file)));

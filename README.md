@@ -8,7 +8,7 @@ A high-performance, single-page professional portfolio built with a core focus o
 
 *   **Responsive Brutalism Design:** A premium, responsive visual language that keeps the project's raw editorial identity while supporting three centralized themes: Midnight Professional, Minimal Light, and Modern Accent.
 *   **Lean Production Front End:** Built with Vanilla JavaScript and semantic HTML5. Tailwind utility classes are compiled into a static stylesheet during the Vercel build; no React or Vue runtime is shipped.
-*   **Authenticated Shared Admin Editor:** `/admin` (with `admin.html` as the static entry point) provides Supabase-authenticated editing and publishing for site metadata, hero/about content, projects, skills, experience, education, certifications, achievements, contact details, footer links, personal details, appearance, typography, and resume metadata.
+*   **Authenticated Shared Admin Editor:** `/admin` (with `admin.html` as the static entry point) provides Vercel-backed login and publishing for site metadata, hero/about content, projects, skills, experience, education, certifications, achievements, contact details, footer links, personal details, appearance, typography, and resume metadata.
 *   **Live Draft Preview:** The dashboard sends validated, unsaved drafts to an isolated public-page preview without writing them to storage.
 *   **Appearance Controls:** Theme, accent, heading/body font, radius, animation, hero layout, section visibility, and navigation visibility are stored in the same validated content model.
 *   **Secured Form Engine:** The Contact section has been heavily armored against spam and cross-site scripting:
@@ -40,9 +40,9 @@ A high-performance, single-page professional portfolio built with a core focus o
 ├── admin/                    # Clean /admin entry point for static Vercel hosting
 ├── admin.html               # Authenticated shared content editor
 ├── admin.js                 # Admin editor UI and import/export actions
-├── supabase-client.js       # Public Supabase config, auth, and content helpers
-├── api/config.js             # Vercel endpoint for public Supabase env values
-├── supabase/schema.sql       # Content table, admin allow-list, and RLS policies
+├── api/auth/                 # Vercel login, session, and logout functions
+├── api/content.js            # Protected publishing and public content reads
+├── lib/auth.js               # Signed Vercel session cookie helpers
 ├── content.js               # Versioned default content model
 ├── content-store.js         # Validation and localStorage persistence
 ├── style.css                # Tailwind input and base visual logic
@@ -59,19 +59,19 @@ A high-performance, single-page professional portfolio built with a core focus o
 
 ## Running Locally
 
-The site is a static front end plus one small Vercel function (`/api/config`). The public Supabase browser key is intentionally safe to expose; database Row Level Security protects publishing.
+The site is a static front end with Vercel Functions for administrator login, logout, and publishing. Published content is stored in Vercel Blob.
 
 1.  **Clone the Repository**
     ```bash
     git clone https://github.com/yashrajrr/portfolio.git
     cd portfolio
     ```
-2.  **Install the build dependency and compile the deployable site**
+2.  **Install dependencies and compile the deployable site**
     ```bash
     npm install
     npm run build
     ```
-3.  **Launch a Local Server**
+3.  **Preview the static site**
     If you have Python installed, run:
     ```bash
     python -m http.server 8000 --directory dist
@@ -80,36 +80,28 @@ The site is a static front end plus one small Vercel function (`/api/config`). T
 4.  **View Site**
 Navigate to `http://localhost:8000`
 
+To use admin login, publishing, and public saved content locally, connect the project to Vercel, pull its Development variables with `npx vercel env pull .env.local`, then run `npm run dev:local`. This local runner serves the built site and the same API handlers used by Vercel.
+
 ### Managing website content
 
-1. Configure Supabase and deploy the site, then open `/admin` (or `admin.html`).
-2. Sign in with an Auth email/password user whose UUID is present in `public.portfolio_admins`.
-3. Edit any field, reorder or remove collection items, and select **Save changes** to upsert the shared `portfolio_content` row.
+1. Connect a Vercel Blob store to the project and configure the administrator environment variables listed below.
+2. Deploy the site, then open `/admin` (or `admin.html`) and sign in.
+3. Edit any field, reorder or remove collection items, and select **Save changes** to publish the shared portfolio content.
 4. Use **Live preview** to inspect the actual public renderer with unsaved changes, or **Export JSON** to keep a portable backup.
 5. Use **Import JSON** to restore an exported content file in another browser.
 
 The Appearance panel provides six colour themes, independent heading/body font selectors, accent colour, radius, motion, hero layout, and visibility controls. The Resume panel manages structured resume content separately from an uploaded PDF. Embedded PDF uploads are limited to 1 MB to stay within browser storage quotas; once published, the validated PDF data is available to public visitors through the shared content row. A committed PDF asset and published relative URL is recommended for larger files.
 
-The public page reads the published row from Supabase on load, so a saved change is shared with every visitor and device. If Supabase is unavailable, the committed seed content remains the safe public fallback. The editor requires a Supabase Auth session and a matching row in `public.portfolio_admins`; database Row Level Security is the final publishing boundary. When Supabase configuration or the network is unavailable, a validated draft can be kept in browser `localStorage` and retried later. Embedded PDFs remain limited to 1 MB; a committed asset (for example `asset/resume.pdf`) and published relative URL is recommended when a separate public file is preferred. The Web3Forms access key is deployment configuration, not an editable admin field.
+The public page reads the latest published content from Vercel Blob. The committed seed content remains the fallback if storage is unavailable. Admin login uses a signed, HttpOnly session cookie, with credentials and signing secret held in Vercel environment variables. When publishing is unavailable, a validated draft can be kept in browser `localStorage` and retried later. Embedded PDFs remain limited to 1 MB. The Web3Forms access key is deployment configuration, not an editable admin field.
 
-### Supabase and Vercel setup
+### Vercel setup
 
-This repository is initialized for the Supabase CLI. From the project root, authenticate and link the hosted project, then apply the versioned schema migration:
+1. Create and connect a Vercel Blob store to the project. Vercel supplies the Blob access token to its functions.
+2. Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in the Vercel project environment. Use a long, unique password.
+3. Set `SESSION_SECRET` to a random secret with at least 32 characters. Keep all three values private and redeploy after changing them.
+4. Open `/admin`, sign in with the configured email and password, and publish the initial content. Login sessions expire after 12 hours.
 
-```powershell
-npx supabase login
-npx supabase link --project-ref <your-project-ref>
-npx supabase db push
-```
-
-The initial migration is `supabase/migrations/20261018160003_portfolio_schema.sql`. `supabase/schema.sql` remains available for manual SQL Editor setup, but the CLI migration is the preferred deployment path.
-
-1. Enable email/password sign-in in Supabase Auth and create the administrator user.
-2. Add that Auth user's UUID to `public.portfolio_admins` with the example insert at the bottom of the migration file.
-3. Add these Vercel project environment variables and redeploy: `SUPABASE_URL` (the project URL) and `SUPABASE_ANON_KEY` (the public browser anon key). Do not expose a service-role key. `api/config.js` returns only these browser-safe values.
-4. Add the deployed site's `/admin` URL to Supabase Auth's allowed redirect URLs if email confirmation or password recovery is enabled.
-
-To reset the current draft to the seed content, select **Reset draft to defaults** in the editor. This does not change the published Supabase row until the seed content is saved again.
+The first successful save creates the shared content record in Blob. To reset the published portfolio to seed content, select **Reset draft to defaults** in the editor and save it.
 
 ---
 

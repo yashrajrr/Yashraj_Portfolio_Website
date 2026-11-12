@@ -204,8 +204,8 @@
     function setAuthMode(mode) {
         authForm.classList.toggle("admin-hidden", mode !== "login");
         authAccount.classList.toggle("admin-hidden", mode !== "account");
-        if (mode === "login") authHelp.textContent = "Use the email and password for an account that has been added to public.portfolio_admins.";
-        if (mode === "account") authHelp.textContent = "Shared saves are protected by Supabase Row Level Security. Sign out when you are finished.";
+        if (mode === "login") authHelp.textContent = "Use the administrator credentials configured in Vercel.";
+        if (mode === "account") authHelp.textContent = "Your administrator session is managed securely by Vercel. Sign out when you are finished.";
     }
     function showProtectedEditor(show) { protectedAdmin.classList.toggle("admin-hidden", !show); }
     function userLabel(user) { return user && (user.email || user.id) ? (user.email || user.id) : "authenticated user"; }
@@ -248,7 +248,7 @@
         setPreviewFrame(true);
         var offline = loadInitialState();
         offlineDraft = readOfflineDraft();
-        return window.PortfolioSupabase.loadPublishedContent().then(function (record) {
+        return fetch("/api/content", { credentials: "same-origin", cache: "no-store" }).then(function (response) { if (!response.ok) throw new Error("Published content could not be loaded."); return response.json(); }).then(function (record) {
             if (attempt !== authAttempt || !authenticatedUser) return;
             var remote = publishedState(record);
             if (remote) {
@@ -269,13 +269,13 @@
             showProtectedEditor(true);
             var errors = [error && error.message ? error.message : "The shared content could not be loaded."];
             if (offline.warning) errors.push(offline.warning);
-            setStatus("Supabase content is unavailable. Working from an offline draft; saves will be kept locally until the connection returns.", errors);
+            setStatus("Vercel content storage is unavailable. Working from an offline draft; saves will be kept locally until storage is available.", errors);
             authHelp.textContent = "Offline draft mode is active. Reconnect and select Save changes to publish the draft.";
         });
     }
     function save() {
         if (saving) return;
-        if (!authenticatedUser || !authorized) { setStatus("Sign in with an allow-listed administrator account before publishing changes.", ["Your Supabase session is not authorized for portfolio publishing."]); return; }
+        if (!authenticatedUser || !authorized) { setStatus("Sign in with the administrator account before publishing changes.", ["Your Vercel session is not authorized for portfolio publishing."]); return; }
         var result = validation(state);
         if (!result.valid) { setStatus("Changes could not be saved.", result.errors); return; }
         var saveAttempt = authAttempt;
@@ -283,19 +283,19 @@
         var saveButton = document.getElementById("save-button");
         if (saveButton) saveButton.disabled = true;
         setStatus("Publishing shared content…");
-        window.PortfolioSupabase.savePublishedContent(result.value, ContentStore.schemaVersion).then(function () {
+        fetch("/api/content", { method: "PUT", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: result.value, schemaVersion: ContentStore.schemaVersion }) }).then(function (response) { return response.json().then(function (body) { if (!response.ok) throw new Error(body.error || "Vercel content storage is unavailable."); return body; }); }).then(function () {
             if (saveAttempt !== authAttempt || !authenticatedUser || !authorized) return;
             state = normalizeState(result.value); savedState = clone(state); savedPendingPublish = false; pendingPublish = false; markClean(); clearOfflineDraft();
             setStatus("Changes published to the shared portfolio.", null, true);
-            authHelp.textContent = "The latest validated content is published in Supabase for the portfolio to load.";
+            authHelp.textContent = "The latest validated content is published to Vercel Blob for the portfolio to load.";
         }).catch(function (error) {
             if (saveAttempt !== authAttempt || !authenticatedUser || !authorized) return;
             try {
                 state = normalizeState(ContentStore.save(result.value)); savedState = clone(state); savedPendingPublish = true; pendingPublish = true; offlineDraft = clone(state); markClean(); updateRestoreDraftButton();
-                setStatus("Shared publishing failed; the validated changes were saved as an offline draft.", [error && error.message ? error.message : "Supabase is unavailable." ]);
-                authHelp.textContent = "Offline draft mode is active. Retry Save changes when Supabase is available.";
+                setStatus("Publishing failed; the validated changes were saved as an offline draft.", [error && error.message ? error.message : "Vercel content storage is unavailable." ]);
+                authHelp.textContent = "Offline draft mode is active. Retry Save changes when Vercel storage is available.";
             } catch (offlineError) {
-                setStatus("Changes could not be published or saved offline.", [error && error.message ? error.message : "Supabase is unavailable.", offlineError.message || "Local storage is unavailable."]);
+                setStatus("Changes could not be published or saved offline.", [error && error.message ? error.message : "Vercel content storage is unavailable.", offlineError.message || "Local storage is unavailable."]);
             }
         }).then(function () {
             saving = false;
@@ -309,48 +309,28 @@
     function importJson() { try { uploadToken += 1; state = normalizeState(ContentStore.import(importText.value)); renderEditor(); markDirty(); importPanel.classList.add("admin-hidden"); setStatus("JSON loaded into the editor. Save changes to publish it.", null, true); } catch (error) { setStatus(error.message || "JSON could not be loaded.", error.details || ["Check that the JSON is a valid portfolio export."]); } }
     function clearEditorAccess() { authAttempt += 1; authenticatedUser = null; authorized = false; editorReady = false; pendingPublish = false; savedPendingPublish = false; offlineDraft = null; restoreDraftButton.classList.add("admin-hidden"); previewPanel.classList.add("admin-hidden"); setPreviewFrame(false); showProtectedEditor(false); }
     function handleSession(session) {
-        if (session && session.user && authenticatedUser && authenticatedUser.id === session.user.id && authorized) return Promise.resolve();
         var attempt = ++authAttempt;
-        if (!session || !session.user) {
-            clearEditorAccess(); setAuthMode("login"); setAuthRetryVisible(false); setAuthStatus("Sign in to open the shared portfolio editor.");
-            return Promise.resolve();
-        }
-        authenticatedUser = session.user; authorized = false; editorReady = false; pendingPublish = false; savedPendingPublish = false; offlineDraft = null; restoreDraftButton.classList.add("admin-hidden"); authUser.textContent = userLabel(session.user); setAuthMode("account"); setPreviewFrame(false); showProtectedEditor(false); setAuthStatus("Checking administrator allow-list…");
-        return window.PortfolioSupabase.isAdmin(session.user).then(function (allowed) {
-            if (attempt !== authAttempt || !authenticatedUser) return;
-            if (!allowed) {
-                editorReady = false; showProtectedEditor(false); setAuthStatus("This account is authenticated but is not allow-listed for portfolio publishing.", ["Add user ID " + session.user.id + " to public.portfolio_admins in Supabase, then sign in again."]); authHelp.textContent = "The database allow-list controls publishing access; authentication alone is not sufficient."; setAuthRetryVisible(true); return;
-            }
-            authorized = true; setAuthStatus("Administrator access verified. Loading shared content…", null, true); setAuthRetryVisible(false); return loadRemoteEditor(attempt);
-        }).catch(function (error) {
-            if (attempt !== authAttempt) return;
-            editorReady = false; showProtectedEditor(false); setPreviewFrame(false); setAuthStatus("Administrator access could not be verified.", [error && error.message ? error.message : "Check the Supabase schema and Row Level Security policies."]); authHelp.textContent = "The editor stays locked until the authenticated user can be checked against public.portfolio_admins."; setAuthRetryVisible(true);
-        });
+        if (!session || !session.user) { clearEditorAccess(); setAuthMode("login"); setAuthRetryVisible(false); setAuthStatus("Sign in to open the portfolio editor."); return Promise.resolve(); }
+        authenticatedUser = session.user; authorized = true; authUser.textContent = userLabel(session.user); setAuthMode("account"); setPreviewFrame(false); showProtectedEditor(false); setAuthStatus("Administrator access verified. Loading published content…", null, true); setAuthRetryVisible(false);
+        return loadRemoteEditor(attempt);
     }
     function signIn(event) {
         event.preventDefault();
         var email = authEmail.value.trim(), password = authPassword.value;
         if (!email || !password) { setAuthStatus("Sign-in needs both fields.", ["Enter the administrator email and password."]); return; }
         authSubmit.disabled = true; setAuthStatus("Signing in…");
-        window.PortfolioSupabase.signIn(email, password).then(function (data) { authPassword.value = ""; return handleSession(data && data.session); }).catch(function (error) { setAuthStatus("Sign-in failed.", [error && error.message ? error.message : "Check the credentials and Supabase Auth configuration."]); }).then(function () { authSubmit.disabled = false; });
+        fetch("/api/auth/login", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email, password: password }) }).then(function (response) { return response.json().then(function (body) { if (!response.ok) throw new Error(body.error || "Check the administrator credentials."); return body; }); }).then(function (data) { authPassword.value = ""; return handleSession(data); }).catch(function (error) { setAuthStatus("Sign-in failed.", [error.message || "Check the administrator credentials and Vercel configuration."]); }).then(function () { authSubmit.disabled = false; });
     }
     function signOut() {
         if (dirty && !window.confirm("You have unsaved changes. Sign out and discard them?")) return;
         signOutButton.disabled = true; setAuthStatus("Signing out…");
-        window.PortfolioSupabase.signOut().then(function () { clearEditorAccess(); setAuthMode("login"); setAuthRetryVisible(false); setAuthStatus("Signed out.", null, true); }).catch(function (error) { setAuthStatus("Sign-out failed.", [error && error.message ? error.message : "The Supabase session could not be closed."]); }).then(function () { signOutButton.disabled = false; });
+        fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }).then(function (response) { if (!response.ok) throw new Error("The session could not be closed."); clearEditorAccess(); setAuthMode("login"); setAuthRetryVisible(false); setAuthStatus("Signed out.", null, true); }).catch(function (error) { setAuthStatus("Sign-out failed.", [error.message || "The Vercel session could not be closed."]); }).then(function () { signOutButton.disabled = false; });
     }
     function setAuthRetryVisible(visible) { authRetry.classList.toggle("admin-hidden", !visible); authRetry.disabled = false; }
-    function retryAuth() { authRetry.disabled = true; setAuthStatus("Retrying Supabase connection and access check…"); initializeAuth(true); }
-    function initializeAuth(retry) {
-        if (!window.PortfolioSupabase) { setAuthMode("locked"); setAuthStatus("Supabase client is unavailable.", ["Load supabase-client.js before the editor."]); setAuthRetryVisible(true); return; }
-        if (authUnsubscribe) { authUnsubscribe(); authUnsubscribe = null; }
-        var ready = retry && typeof window.PortfolioSupabase.retry === "function" ? window.PortfolioSupabase.retry() : window.PortfolioSupabase.ready();
-        ready.then(function (result) {
-            if (!result.configured || !result.available) { setAuthMode("locked"); setAuthStatus("Supabase setup is required before /admin can open.", [result.message, "Set SUPABASE_URL and SUPABASE_ANON_KEY in Vercel, then redeploy."]); authHelp.textContent = "The editor remains locked until the public Supabase URL and anon key can be loaded from /api/config."; setAuthRetryVisible(true); return null; }
-            setAuthRetryVisible(false);
-            setAuthStatus("Checking the current Supabase session…");
-            return window.PortfolioSupabase.onAuthStateChange(function (event, session) { handleSession(session); }).then(function (unsubscribe) { authUnsubscribe = unsubscribe; return window.PortfolioSupabase.getSession(); }).then(handleSession);
-        }).catch(function (error) { setAuthMode("locked"); setAuthStatus("Supabase could not initialize.", [error && error.message ? error.message : "Check the deployment configuration."]); authHelp.textContent = "The editor remains locked until Supabase configuration and the browser SDK are available."; setAuthRetryVisible(true); });
+    function retryAuth() { authRetry.disabled = true; initializeAuth(); }
+    function initializeAuth() {
+        setAuthStatus("Checking the Vercel administrator session…");
+        fetch("/api/auth/session", { credentials: "same-origin", cache: "no-store" }).then(function (response) { if (!response.ok) throw new Error("Vercel authentication is not configured."); return response.json(); }).then(handleSession).catch(function (error) { setAuthMode("locked"); setAuthStatus("Vercel admin access is not configured.", [error.message || "Check the Vercel environment variables."]); authHelp.textContent = "Set ADMIN_EMAIL, ADMIN_PASSWORD, and SESSION_SECRET in Vercel, then redeploy."; setAuthRetryVisible(true); });
     }
     function init() {
         root = document.getElementById("editor-root"); status = document.getElementById("status"); previewPanel = document.getElementById("preview-panel"); importPanel = document.getElementById("import-panel"); importText = document.getElementById("import-json"); dirtyIndicator = document.getElementById("dirty-indicator");
@@ -360,7 +340,7 @@
         document.getElementById("storage-key-label").textContent = ContentStore.storageKey;
         document.getElementById("editor-form").addEventListener("submit", function (event) { event.preventDefault(); save(); }); document.getElementById("save-button").addEventListener("click", save); document.getElementById("cancel-button").addEventListener("click", cancel); document.getElementById("reset-button").addEventListener("click", reset); document.getElementById("preview-button").addEventListener("click", function () { previewPanel.classList.remove("admin-hidden"); previewPanel.scrollIntoView({ behavior: "smooth", block: "start" }); sendPreview(); }); document.getElementById("close-preview").addEventListener("click", function () { previewPanel.classList.add("admin-hidden"); }); document.getElementById("export-button").addEventListener("click", exportJson); document.getElementById("import-toggle").addEventListener("click", function () { importPanel.classList.toggle("admin-hidden"); if (!importPanel.classList.contains("admin-hidden")) importText.focus(); }); document.getElementById("import-button").addEventListener("click", importJson); document.querySelectorAll("[data-section-target]").forEach(function (button) { button.addEventListener("click", function () { goToSection(button.getAttribute("data-section-target")); }); });
         authForm.addEventListener("submit", signIn); signOutButton.addEventListener("click", signOut); authRetry.addEventListener("click", retryAuth); restoreDraftButton.addEventListener("click", restoreDraft); setAuthMode("login"); setAuthRetryVisible(false); showProtectedEditor(false); initializeAuth(false);
-        window.addEventListener("beforeunload", function (event) { revokeResumePreview(); if (authUnsubscribe) authUnsubscribe(); if (!dirty) return; event.preventDefault(); event.returnValue = ""; });
+        window.addEventListener("beforeunload", function (event) { revokeResumePreview(); if (!dirty) return; event.preventDefault(); event.returnValue = ""; });
     }
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 }());
